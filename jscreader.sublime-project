@@ -3,8 +3,8 @@
 	[
 		{
 			"path": ".",
-            "file_exclude_patterns": ["*.sublime-workspace", "*.class"],
-            "folder_exclude_patterns": ["javafx-sdk*"]
+            "file_exclude_patterns": ["*.sublime-workspace", "*.class", "gradlew", "gradlew.bat"],
+            "folder_exclude_patterns": ["build", ".gradle", "gradle"]
 		}
 	]
 }
