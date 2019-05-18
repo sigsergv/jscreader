@@ -16,22 +16,23 @@ import java.beans.EventHandler;
 
 
 /**
- * Maintains PC/SC terminals list: detect changes etc.
+ * Maintains PC/SC terminals list: detect changes etc. Also stores currently selected terminal.
  *
  * Simple singleton.
  */
 final class DeviceManager {
     private static DeviceManager instance = null;
 
-    private List<String> terminalDevices;
+    private List<String> terminalNames;
     private Timer timer;
     private boolean locked;
     private TerminalFactory terminalFactory;
     private List listeners = new ArrayList();
+    private String selectedTerminalName = null;
 
 
     private DeviceManager() {
-        terminalDevices = new ArrayList<>(5);
+        terminalNames = new ArrayList<>(5);
         timer = new Timer(true);
         locked = false;
         terminalFactory = TerminalFactory.getDefault();  // questionable, because lock factory at start
@@ -52,8 +53,23 @@ final class DeviceManager {
     }
 
     public List<String> getTerminalNames() {
-        String[] list = new String[terminalDevices.size()];
-        return terminalDevices;
+        return terminalNames;
+    }
+
+    public String getSelectedTerminalName() {
+        return selectedTerminalName;
+    }
+
+    public void setSelectedTerminalName(String name) {
+        if (name == selectedTerminalName) {
+            return;
+        }
+        // check that terminal exists
+        if (getTerminal(name) == null) {
+            return;
+        }
+        selectedTerminalName = name;
+        fireChangedEvent();
     }
 
     public CardTerminal getTerminal(String name) {
@@ -72,22 +88,27 @@ final class DeviceManager {
         locked = true;
         try {
             var terminals = terminalFactory.terminals().list();
-            var terminalNames = new ArrayList<String>(5);
+            var newTerminalNames = new ArrayList<String>(terminals.size());
             for (CardTerminal c : terminals) {
-                terminalNames.add(c.getName());
+                newTerminalNames.add(c.getName());
             }
-            if (!terminalNames.equals(terminalDevices)) {
-                terminalDevices = terminalNames;
-                fireTerminalsChangedEvent();
+            if (!newTerminalNames.equals(terminalNames)) {
+                terminalNames = newTerminalNames;
+                if (terminalNames.indexOf(selectedTerminalName) == -1) {
+                    selectedTerminalName = null;
+                }
+                if (selectedTerminalName == null && terminalNames.size() > 0) {
+                    selectedTerminalName = terminalNames.get(0);
+                }
+                fireChangedEvent();
             }
-
         } catch (CardException e) {
             System.err.printf("reloadTerminalDevices failed: %s%n", e);
         }
         locked = false;
     }
 
-    private synchronized void fireTerminalsChangedEvent() {
+    private synchronized void fireChangedEvent() {
         var event = new ChangeEvent(this);
 
         for (Object l : listeners) {

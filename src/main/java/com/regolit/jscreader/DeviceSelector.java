@@ -8,25 +8,26 @@ import com.regolit.jscreader.event.ChangeEvent;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 
 /**
  * Implements PC/SC device selection.
  */
 class DeviceSelector extends MenuButton implements ChangeListener {
     private String value;
+    private EventHandler<ActionEvent> menuEvent;
 
     public DeviceSelector() {
         var dm = DeviceManager.getInstance();
-        value = null;  // means no terminals selected
         dm.addChangeListener(this);
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+        menuEvent = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                var dm = DeviceManager.getInstance();
+                var source = (MenuItem)e.getSource();
+                dm.setSelectedTerminalName(source.getId());
+            }
+        };
     }
 
     public void stateChanged(ChangeEvent e) {
@@ -36,7 +37,7 @@ class DeviceSelector extends MenuButton implements ChangeListener {
         var terminalNames = dm.getTerminalNames();
 
         var items = getItems();
-        var currentValue = getValue();
+        var currentValue = dm.getSelectedTerminalName();
 
         // to avoid "java.lang.IllegalStateException: Not on FX application thread"
         Platform.runLater(() -> {
@@ -46,18 +47,15 @@ class DeviceSelector extends MenuButton implements ChangeListener {
                 cm.hide();
             }
             for (var name : terminalNames) {
-                items.add(new MenuItem(name));
+                var item = new MenuItem(String.format("Terminal: %s", name));
+                item.setOnAction(menuEvent);
+                item.setId(name);
+                items.add(item);
             }
-            if (currentValue==null || terminalNames.indexOf(currentValue)==-1) {
-                if (terminalNames.size() == 0) {
-                    // clear
-                    value = null;
+            if (currentValue == null) {
                     setText("");
-                } else {
-                    var first = terminalNames.get(0);
-                    setText(first);
-                    value = first;
-                }
+            } else {
+                setText(currentValue);
             }
         });
     }
