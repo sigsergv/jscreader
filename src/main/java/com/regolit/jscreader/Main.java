@@ -12,6 +12,9 @@ import javafx.scene.control.TextArea;
 public class Main extends Application {
     @Override
     public void start(Stage stage) {
+        // start Manager
+        DeviceManager.getInstance();
+        
         var deviceSelector = new DeviceSelector();
         deviceSelector.setPrefWidth(Double.MAX_VALUE);
 
