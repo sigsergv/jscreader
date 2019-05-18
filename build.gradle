@@ -1,0 +1,21 @@
+plugins {
+  id 'application'
+  id 'org.openjfx.javafxplugin' version '0.0.7'
+}
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = "11"
+    modules = [ 'javafx.controls' ]
+}
+
+group = 'com.regolit.jscreader'
+version = '1.0.0'
+
+sourceCompatibility = 11.0
+targetCompatibility = 11.0
+
+mainClassName = 'com.regolit.jscreader.Main'
