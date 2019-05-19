@@ -3,6 +3,8 @@
 package com.regolit.jscreader;
 
 import com.regolit.jscreader.event.ChangeListener;
+import com.regolit.jscreader.event.CardInsertedListener;
+import com.regolit.jscreader.event.CardRemovedListener;
 import com.regolit.jscreader.event.ChangeEvent;
 
 import java.util.List;
@@ -13,6 +15,8 @@ import javax.smartcardio.TerminalFactory;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CardException;
 import java.beans.EventHandler;
+import java.lang.Thread;
+import java.util.EventListener;
 
 
 /**
@@ -29,13 +33,21 @@ final class DeviceManager {
     private TerminalFactory terminalFactory;
     private List listeners = new ArrayList();
     private String selectedTerminalName = null;
+    private CardMonitoringThread monitoringThread;
 
+    private class CardMonitoringThread extends Thread {
+        CardTerminal terminal;
+        public CardMonitoringThread(CardTerminal terminal) {
+            this.terminal = terminal;
+        }
+    }
 
     private DeviceManager() {
         terminalNames = new ArrayList<>(5);
         timer = new Timer(true);
         locked = false;
         terminalFactory = TerminalFactory.getDefault();  // questionable, because lock factory at start
+        monitoringThread = null;
 
         // execute task every second
         timer.schedule(new TimerTask() {
@@ -43,6 +55,14 @@ final class DeviceManager {
                 reloadTerminalDevices();
             }
         }, 1000, 1000);
+
+        // // start card monitoring thread
+        // var monitoringThread = new Thread() {
+        //     public void run() {
+        //         System.err.println("Card monitoring thread started");
+        //     }
+        // };
+        // monitoringThread.start();
     }
 
     public static DeviceManager getInstance() {
@@ -77,7 +97,7 @@ final class DeviceManager {
         return terminals.getTerminal(name);
     }
 
-    public synchronized void addChangeListener(ChangeListener l) {
+    public synchronized void addListener(EventListener l) {
         listeners.add(l);
     }
 
@@ -93,12 +113,18 @@ final class DeviceManager {
                 newTerminalNames.add(c.getName());
             }
             if (!newTerminalNames.equals(terminalNames)) {
+                boolean restartThreadFlag = false;
                 terminalNames = newTerminalNames;
                 if (terminalNames.indexOf(selectedTerminalName) == -1) {
                     selectedTerminalName = null;
+                    restartThreadFlag = true;
                 }
                 if (selectedTerminalName == null && terminalNames.size() > 0) {
                     selectedTerminalName = terminalNames.get(0);
+                    restartThreadFlag = true;
+                }
+                if (restartThreadFlag) {
+                    restartCardMonitoringThread();
                 }
                 fireChangedEvent();
             }
@@ -116,5 +142,60 @@ final class DeviceManager {
                 ((ChangeListener)l).stateChanged(event);
             }
         }
+    }
+
+    private synchronized void fireCardInsertedEvent() {
+        var event = new ChangeEvent(this);
+
+        for (Object l : listeners) {
+            if (l instanceof CardInsertedListener) {
+                ((CardInsertedListener)l).cardInserted(event);
+            }
+        }
+    }
+    
+    private synchronized void fireCardRemovedEvent() {
+        var event = new ChangeEvent(this);
+
+        for (Object l : listeners) {
+            if (l instanceof CardRemovedListener) {
+                ((CardRemovedListener)l).cardRemoved(event);
+            }
+        }
+    }
+    
+
+    private void restartCardMonitoringThread() {
+        System.err.println("restartCardMonitoringThread() call");
+        // stop existing thread
+        if (monitoringThread != null) {
+            var t = monitoringThread;
+            monitoringThread = null;
+            t.stop();
+        }
+        var name = getSelectedTerminalName();
+        if (name == null) {
+            return;
+        } 
+        var terminal = getTerminal(name);
+        if (terminal == null) {
+            return;
+        }
+        var thread = new CardMonitoringThread(terminal) {
+            public void run() {
+                try {
+                    for (int i=0; i<10000; i++) {
+                        this.terminal.waitForCardPresent(0);
+                        fireCardInsertedEvent();
+                        this.terminal.waitForCardAbsent(0);
+                        fireCardRemovedEvent();
+                    }
+                } catch (CardException e) {
+                    System.err.printf("Failed to monitor card on terminal: `%s`%n", this.terminal.getName());
+                }
+            }
+        };
+        monitoringThread = thread;
+        monitoringThread.start();
     }
 }

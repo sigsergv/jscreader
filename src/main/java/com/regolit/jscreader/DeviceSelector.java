@@ -13,6 +13,8 @@ import javafx.event.ActionEvent;
 
 /**
  * Implements PC/SC device selection.
+ *
+ * It doesn't store selected item, DeviceManager does this instead.
  */
 class DeviceSelector extends MenuButton implements ChangeListener {
     private String value;
@@ -20,7 +22,7 @@ class DeviceSelector extends MenuButton implements ChangeListener {
 
     public DeviceSelector() {
         var dm = DeviceManager.getInstance();
-        dm.addChangeListener(this);
+        dm.addListener(this);
         menuEvent = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 var dm = DeviceManager.getInstance();
