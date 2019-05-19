@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
-import javafx.scene.control.TextArea;
 
 
 public class Main extends Application {
@@ -20,7 +19,7 @@ public class Main extends Application {
         deviceSelector.setPrefWidth(Double.MAX_VALUE);
 
         var cardTree = new CardItemsTree();
-        var outputArea = new TextArea();
+        var outputArea = new CardInfoTextView(cardTree);
 
         var hbox = new HBox(4);
         hbox.getChildren().addAll(cardTree, outputArea);
