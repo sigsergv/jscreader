@@ -6,7 +6,10 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.event.EventHandler;
+import javafx.stage.WindowEvent;
 import javafx.scene.layout.HBox;
+import javafx.application.Platform;
 
 
 public class Main extends Application {
@@ -14,6 +17,14 @@ public class Main extends Application {
     public void start(Stage stage) {
         // start Manager
         DeviceManager.getInstance();
+
+        // required to properly terminate all threads
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override public void handle(WindowEvent e) {
+                Platform.exit();
+                System.exit(0);
+            }
+        });
 
         var deviceSelector = new DeviceSelector();
         deviceSelector.setPrefWidth(Double.MAX_VALUE);

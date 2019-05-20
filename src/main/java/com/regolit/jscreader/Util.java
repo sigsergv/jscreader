@@ -19,4 +19,25 @@ class Util {
         return String.join(" ", bytesStrings);
     }
 
+    public static String bytesToString(byte[] bytes) {
+        try {
+            return new String(bytes, "ISO-8859-1");
+        } catch (java.io.UnsupportedEncodingException e) {
+            return "";
+        }
+    }
+
+    public static byte[] concatArrays(byte[] a, byte[] b) {
+        byte[] buffer = new byte[a.length + b.length];
+        System.arraycopy(a, 0, buffer, 0, a.length);
+        System.arraycopy(b, 0, buffer, a.length, b.length);
+        return buffer;
+    }
+
+    public static byte[] copyArray(byte[] buffer, int from, int length) {
+        byte[] res = new byte[length];
+        System.arraycopy(buffer, from, res, 0, length);
+        return res;
+    }
+
 }

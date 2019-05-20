@@ -6,31 +6,17 @@ import com.regolit.jscreader.event.ChangeEvent;
 import com.regolit.jscreader.event.CardInsertedListener;
 import com.regolit.jscreader.event.CardRemovedListener;
 
+import com.regolit.jscreader.model.CardItemRootModel;
+import com.regolit.jscreader.model.CardItemGeneralInformationModel;
+
 import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
 import javafx.application.Platform;
 import javax.smartcardio.CardException;
 
-class CardItemsTree extends TreeView
+class CardItemsTree extends TreeView<CardItemRootModel>
     implements CardInsertedListener, CardRemovedListener
 {
-    public static class RootModel {
-        String title;
-        RootModel(String title) {
-            this.title = title;
-        }
-        @Override public String toString() {
-            return title;
-        }
-    }
-
-    public static class CardGeneralInfoModel extends RootModel {
-        byte[] ATR;
-        CardGeneralInfoModel(String title) {
-            super(title);
-        }
-    }
-
     public CardItemsTree() {
         // subscribe to card inserted event
         var dm = DeviceManager.getInstance();
@@ -57,12 +43,12 @@ class CardItemsTree extends TreeView
         }
 
         // set new tree nodes
-        var root = new TreeItem();
+        var root = new TreeItem<CardItemRootModel>();
         root.setExpanded(true);
         setRoot(root);
 
         // "General information" node
-        var cardGeneralInfo = new CardGeneralInfoModel("General Information");
+        var cardGeneralInfo = new CardItemGeneralInformationModel("General Information");
         try {
             var card = terminal.connect("*");
             cardGeneralInfo.ATR = card.getATR().getBytes();
@@ -70,8 +56,8 @@ class CardItemsTree extends TreeView
         } catch (CardException e) {
             System.err.printf("Card read failed: %s%n", e);
         }
-        var generalInformationNode = new TreeItem(cardGeneralInfo);
-        root.getChildren().addAll(generalInformationNode);
+        var generalInformationNode = new TreeItem<CardItemRootModel>(cardGeneralInfo);
+        root.getChildren().add(generalInformationNode);
 
         // other nodes
 

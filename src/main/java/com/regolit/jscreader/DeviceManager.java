@@ -16,6 +16,7 @@ import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CardException;
 import java.lang.Thread;
 import java.util.EventListener;
+import javafx.application.Platform;
 
 
 /**
@@ -30,7 +31,7 @@ final class DeviceManager {
     private Timer timer;
     private boolean locked;
     private TerminalFactory terminalFactory;
-    private List listeners = new ArrayList();
+    private List<EventListener> listeners = new ArrayList<EventListener>();
     private String selectedTerminalName = null;
     private CardMonitoringThread monitoringThread;
 
@@ -49,9 +50,11 @@ final class DeviceManager {
         monitoringThread = null;
 
         // execute task every second
+        var me = this;
         timer.schedule(new TimerTask() {
             public void run() {
-                reloadTerminalDevices();
+                // execute in GUI thread
+                Platform.runLater(me::reloadTerminalDevices);
             }
         }, 1000, 1000);
 
@@ -84,7 +87,7 @@ final class DeviceManager {
             return;
         }
         // check that terminal exists
-        if (getTerminal(name) == null) {
+        if (terminalNames.indexOf(name) == -1) {
             return;
         }
         selectedTerminalName = name;
@@ -170,7 +173,7 @@ final class DeviceManager {
         if (monitoringThread != null) {
             var t = monitoringThread;
             monitoringThread = null;
-            t.stop();
+            t.interrupt();
         }
         var name = getSelectedTerminalName();
         if (name == null) {
