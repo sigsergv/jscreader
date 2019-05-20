@@ -14,7 +14,6 @@ import java.util.TimerTask;
 import javax.smartcardio.TerminalFactory;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CardException;
-import java.beans.EventHandler;
 import java.lang.Thread;
 import java.util.EventListener;
 
