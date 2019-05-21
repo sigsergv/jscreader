@@ -1,11 +1,11 @@
 /* INSERT LICENSE HERE */
 
-package com.regolit.jscreader;
+package com.regolit.jscreader.util;
 
 import java.util.ArrayList;
 import java.lang.StringBuilder;
 
-class Util {
+public class Util {
     /**
      * Convert byte array to HEX representation: "XX XX XX XX ..."
      * 
@@ -52,5 +52,28 @@ class Util {
             }
         }
         return sb.toString();
+    }
+
+    public static byte[] toByteArray(String s) {
+        int len = s.length();
+        byte[] buf = new byte[len/2];
+        int bufLen = 0;
+        int i = 0;
+        
+        while (i < len) {
+            char c1 = s.charAt(i);
+            i++;
+            if (c1 == ' ') {
+                continue;
+            }
+            char c2 = s.charAt(i);
+            i++;
+
+            byte d = (byte)((Character.digit(c1, 16) << 4) + (Character.digit(c2, 16)));
+            buf[bufLen] = d;
+            ++bufLen;
+        }
+
+        return copyArray(buf, 0, bufLen);
     }
 }

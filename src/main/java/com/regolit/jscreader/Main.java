@@ -2,6 +2,7 @@
 
 package com.regolit.jscreader;
 
+import com.regolit.jscreader.util.CandidateApplications;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         // start Manager
         DeviceManager.getInstance();
+        CandidateApplications.getInstance();
 
         // required to properly terminate all threads
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {

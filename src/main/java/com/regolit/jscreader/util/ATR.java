@@ -1,6 +1,6 @@
 /* INSERT LICENSE HERE */
 
-package com.regolit.jscreader;
+package com.regolit.jscreader.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.lang.StringBuilder;
 /**
  * Parse ATR to human readable form.
  */
-class ATR {
+public class ATR {
     private static class ATRParsingException extends Exception {
         public ATRParsingException(String message) {
             super(message);

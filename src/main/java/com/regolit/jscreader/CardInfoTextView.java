@@ -2,7 +2,10 @@
 
 package com.regolit.jscreader;
 
+import com.regolit.jscreader.util.Util;
+import com.regolit.jscreader.util.ATR;
 import com.regolit.jscreader.model.CardItemRootModel;
+import com.regolit.jscreader.model.CardItemAdfModel;
 import com.regolit.jscreader.model.CardItemGeneralInformationModel;
 
 import javafx.scene.control.TreeItem;
@@ -28,6 +31,8 @@ class CardInfoTextView extends TextArea {
                 var nodeValue = ((TreeItem)newValue).getValue();
                 if (nodeValue instanceof CardItemGeneralInformationModel) {
                     processValue((CardItemGeneralInformationModel)nodeValue);
+                } else if (nodeValue instanceof CardItemAdfModel) {
+                    processValue((CardItemAdfModel)nodeValue);
                 }
                 // System.out.println(nodeValue.getClass().getName());
                 // processValue(nodeValue);
@@ -42,6 +47,14 @@ class CardInfoTextView extends TextArea {
         text += String.format("ATR: %s%n", Util.hexify(value.ATR));
         var atr = new ATR(value.ATR);
         text += atr.parseToText() + "\n";
+        setText(text);
+    }
+
+    private void processValue(CardItemAdfModel value) {
+        processValue((CardItemRootModel)value);
+
+        var text = getText();
+        text += String.format("Application name: %s%n", value.name);
         setText(text);
     }
 

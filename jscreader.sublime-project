@@ -18,5 +18,15 @@
         "osx": {
             "cmd": ["./gradlew run"]
         }
+    }, {
+        "name": "gradle build",
+        "working_dir": "${project_path}",
+        "shell": true,
+        "linux": {
+            "cmd": ["./gradlew build"]
+        },
+        "osx": {
+            "cmd": ["./gradlew build"]
+        }
     }]
 }
