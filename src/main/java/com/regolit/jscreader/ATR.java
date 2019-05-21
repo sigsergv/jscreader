@@ -3,6 +3,7 @@
 package com.regolit.jscreader;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.lang.StringBuilder;
 
 /**
@@ -141,7 +142,7 @@ class ATR {
                     int objLen = historicalBytes[p] & 0xF;
                     int objTag = ((historicalBytes[p] >> 4) & 0xF) + 0x40;
                     byte[] objData = Util.copyArray(historicalBytes, p+1, objLen);
-                    parseHistoricalBytesValue(objTag, objData);
+                    sb.append(parseHistoricalBytesValue(objTag, objData));
                     p += objLen + 1;
                 }
             } else if (historicalBytes[0] == 0x0) {
@@ -158,7 +159,7 @@ class ATR {
                     int objLen = historicalBytes[p] & 0xF;
                     int objTag = ((historicalBytes[p] >> 4) & 0xF) + 0x40;
                     byte[] objData = Util.copyArray(historicalBytes, p+1, objLen);
-                    parseHistoricalBytesValue(objTag, objData);
+                    sb.append(parseHistoricalBytesValue(objTag, objData));
                     p += objLen + 1;
                 }
                 sb.append("  Status indicator bytes:\n");
@@ -182,25 +183,26 @@ class ATR {
         return res;
     }
 
-    private static void parseHistoricalBytesValue(int tag, byte[] value) {
+    private static String parseHistoricalBytesValue(int tag, byte[] value) {
         System.out.printf("  TAG: %02X; DATA: %s%n", tag, Util.hexify(value));
+        var sb = new StringBuilder(500);
 
         // print additional details
         byte b;
         String s = "";
         switch (tag) {
         case 0x41:
-            System.out.println("    Country code");
+            sb.append("    Country code\n");
             break;
         case 0x42:
             break;
         case 0x43:
             b = value[0];
-            System.out.println("    Card service data:");
-            System.out.printf("      Application selection by full DF name: %s%n", intToBoolString(b & 0x80));
-            System.out.printf("      Application selection by partial DF name: %s%n", intToBoolString(b & 0x40));
-            System.out.printf("      BER-TLV data objects in EF.DIR: %s%n", intToBoolString(b & 0x20));
-            System.out.printf("      BER-TLV data objects in EF.ATR: %s%n", intToBoolString(b & 0x10));
+            sb.append("    Card service data:\n");
+            sb.append(String.format("      Application selection by full DF name: %s\n", intToBoolString(b & 0x80)));
+            sb.append(String.format("      Application selection by partial DF name: %s\n", intToBoolString(b & 0x40)));
+            sb.append(String.format("      BER-TLV data objects in EF.DIR: %s\n", intToBoolString(b & 0x20)));
+            sb.append(String.format("      BER-TLV data objects in EF.ATR: %s\n", intToBoolString(b & 0x10)));
             switch ((b >> 1) & 0x7) {
             case 0x4:
                 s = "by the READ BINARY command (transparent structure)";
@@ -212,41 +214,43 @@ class ATR {
                 s = "by the GET DATA command (TLV structure)";
                 break;
             } 
-            System.out.printf("      EF.DIR and EF.ATR access services: %s%n", s);
+            sb.append(String.format("      EF.DIR and EF.ATR access services: %s\n", s));
             if ((b & 1) == 0) {
-                System.out.println("      Card with MF");
+                sb.append("      Card with MF\n");
             } else {
-                System.out.println("      Card without MF");
+                sb.append("      Card without MF\n");
             }
             break;
         case 0x44:
-            System.out.println("    Initial access data");
+            sb.append("    Initial access data\n");
             break;
         case 0x45:
-            System.out.println("    Card issuer's data");
+            sb.append("    Card issuer's data\n");
             break;
         case 0x46:
-            System.out.println("    Pre-issuing data");
+            sb.append("    Pre-issuing data\n");
             break;
         case 0x47:
-            System.out.println("    Card capabilities");
+            sb.append("    Card capabilities\n");
             for (String x: getCapabilities(value)) {
-                System.out.printf("      %s%n", x);
+                sb.append(String.format("      %s\n", x));
             }
             break;
         case 0x48:
-            System.out.println("    Status information:");
+            sb.append("    Status information:\n");
             for (String x: getStatusIndicatorBytes(value)) {
-                System.out.printf("      %s%n", x);
+                sb.append(String.format("      %s\n", x));
             }
             break;
         case 0x4D:
-            System.out.println("    Extended header list");
+            sb.append("    Extended header list\n");
             break;
         case 0x4F:
-            System.out.println("    Application identifier");
+            sb.append("    Application identifier\n");
             break;
         }
+
+        return sb.toString();
     }
 
     private static String intToBoolString(int i) {
@@ -286,7 +290,7 @@ class ATR {
         return items.toArray(new String[0]);
     }
 
-    private static String[] getCapabilities(byte[] value) {
+    private static List<String> getCapabilities(byte[] value) {
         ArrayList<String> items = new ArrayList<String>(5);
         String s;
         byte b;
@@ -374,6 +378,6 @@ class ATR {
                 4*((b>>2)&1) + 2*((b>>1)&1) + (b&1) + 1);
             items.add(s);
         }
-        return items.toArray(new String[0]);
+        return items;
     }
 }
