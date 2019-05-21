@@ -166,13 +166,12 @@ class ATR {
                 for (String x: getStatusIndicatorBytes(Util.copyArray(historicalBytes, historicalBytes.length - 3, 3))) {
                     sb.append(String.format("    %s%n", x));
                 }
-                // System.out.printf("  Status indicator bytes: %s%n", Util.hexify(Util.copyArray(historicalBytes, historicalBytes.length - 3, 3)));
             } else if (historicalBytes[0] == 0x10) {
                 // ???
             } else {
                 // show as is
-                // try to parse according to ISO 7816-10 ?
                 sb.append("Proprietary historical bytes structure.\n");
+                sb.append(String.format("  ASCII: \"%s\"\n", Util.asciify(historicalBytes)));
             }
             res = sb.toString();
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {

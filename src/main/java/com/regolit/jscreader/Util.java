@@ -3,6 +3,7 @@
 package com.regolit.jscreader;
 
 import java.util.ArrayList;
+import java.lang.StringBuilder;
 
 class Util {
     /**
@@ -40,4 +41,16 @@ class Util {
         return res;
     }
 
+    public static String asciify(byte[] bytes) {
+        // var characters = new ArrayList<Character>(bytes.length);
+        StringBuilder sb = new StringBuilder(bytes.length); 
+        for (var b : bytes) {
+            if (b >= 32 && b <= 126) {
+                sb.append(Character.valueOf((char)b));
+            } else {
+                sb.append('.');
+            }
+        }
+        return sb.toString();
+    }
 }
