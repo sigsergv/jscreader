@@ -34,7 +34,7 @@ final class DeviceManager {
     private TerminalFactory terminalFactory;
     private List<EventListener> listeners = new ArrayList<EventListener>();
     private String selectedTerminalName = null;
-    private boolean selectedTerminalCardInserted = false;
+    private Boolean selectedTerminalCardInserted = null;
     private CardMonitoringThread monitoringThread;
 
     private class CardMonitoringThread extends Thread {
@@ -130,18 +130,27 @@ final class DeviceManager {
                 terminalNames = newTerminalNames;
                 if (terminalNames.indexOf(selectedTerminalName) == -1) {
                     selectedTerminalName = null;
-                    // restartThreadFlag = true;
                 }
                 if (selectedTerminalName == null && terminalNames.size() > 0) {
                     selectedTerminalName = terminalNames.get(0);
-                    // restartThreadFlag = true;
                 }
 
-                if (selectedTerminalName == null) {
-                    selectedTerminalCardInserted = false;
-                } else {
-                    var t = terminalsMap.get(selectedTerminalName);
-                    if (t != null) {
+                fireChangedEvent();
+            }
+            if (selectedTerminalName == null) {
+                selectedTerminalCardInserted = null;
+            } else {
+                var t = terminalsMap.get(selectedTerminalName);
+                if (t != null) {
+                    if (selectedTerminalCardInserted == null) {
+                        // i.e. there is no information about status
+                        selectedTerminalCardInserted = t.isCardPresent();
+                        System.out.printf("New card information: %s\n", selectedTerminalCardInserted);
+                        if (selectedTerminalCardInserted) {
+                            fireCardInsertedEvent();
+                        }
+                    } else {
+                        // i.e. previous card state is known
                         var p = t.isCardPresent();
                         if (selectedTerminalCardInserted != p) {
                             if (p) {
@@ -152,10 +161,6 @@ final class DeviceManager {
                         }
                     }
                 }
-                // if (restartThreadFlag) {
-                //     restartCardMonitoringThread();
-                // }
-                fireChangedEvent();
             }
         } catch (CardException e) {
             System.err.printf("reloadTerminalDevices failed: %s%n", e);
@@ -196,77 +201,43 @@ final class DeviceManager {
 
     // these two methods below are really required, because current implementation of PCSCTerminals.java
     // uses single SCARDCONTEXT for all threads/terminals
-    private boolean terminalWaitForCardPresent(CardTerminal terminal, long timeout)
-        throws CardException
-    {
-        if (timeout == 0) {
-            timeout = 3600000;  // one hour
-        }
-        long limitTime = System.currentTimeMillis() + timeout;
-
-        while (true) {
-            if (System.currentTimeMillis() > limitTime) {
-                return false;
-            }
-            if (terminal.waitForCardPresent(1000) == false) {
-                continue;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    private boolean terminalWaitForCardAbsent(CardTerminal terminal, long timeout)
-        throws CardException
-    {
-        if (timeout == 0) {
-            timeout = 3600000;  // one hour
-        }
-        long limitTime = System.currentTimeMillis() + timeout;
-
-        while (true) {
-            if (System.currentTimeMillis() > limitTime) {
-                return false;
-            }
-            if (terminal.waitForCardAbsent(1000) == false) {
-                continue;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    // private void restartCardMonitoringThread() {
-    //     System.err.println("restartCardMonitoringThread() call");
-    //     // stop existing thread
-    //     if (monitoringThread != null) {
-    //         var t = monitoringThread;
-    //         monitoringThread = null;
-    //         t.interrupt();
+    // private boolean terminalWaitForCardPresent(CardTerminal terminal, long timeout)
+    //     throws CardException
+    // {
+    //     if (timeout == 0) {
+    //         timeout = 3600000;  // one hour
     //     }
-    //     var name = getSelectedTerminalName();
-    //     if (name == null) {
-    //         return;
-    //     } 
-    //     var terminal = getTerminal(name);
-    //     if (terminal == null) {
-    //         return;
-    //     }
-    //     var thread = new CardMonitoringThread(terminal) {
-    //         public void run() {
-    //             try {
-    //                 for (int i=0; i<10000; i++) {
-    //                     terminalWaitForCardPresent(this.terminal, 0);
-    //                     fireCardInsertedEvent();
-    //                     terminalWaitForCardAbsent(this.terminal, 0);
-    //                     fireCardRemovedEvent();
-    //                 }
-    //             } catch (CardException e) {
-    //                 System.err.printf("Failed to monitor card on terminal: `%s`%n", this.terminal.getName());
-    //             }
+    //     long limitTime = System.currentTimeMillis() + timeout;
+
+    //     while (true) {
+    //         if (System.currentTimeMillis() > limitTime) {
+    //             return false;
     //         }
-    //     };
-    //     monitoringThread = thread;
-    //     monitoringThread.start();
+    //         if (terminal.waitForCardPresent(1000) == false) {
+    //             continue;
+    //         } else {
+    //             return true;
+    //         }
+    //     }
+    // }
+
+    // private boolean terminalWaitForCardAbsent(CardTerminal terminal, long timeout)
+    //     throws CardException
+    // {
+    //     if (timeout == 0) {
+    //         timeout = 3600000;  // one hour
+    //     }
+    //     long limitTime = System.currentTimeMillis() + timeout;
+
+    //     while (true) {
+    //         if (System.currentTimeMillis() > limitTime) {
+    //             return false;
+    //         }
+    //         if (terminal.waitForCardAbsent(1000) == false) {
+    //             continue;
+    //         } else {
+    //             return true;
+    //         }
+    //     }
     // }
 }
