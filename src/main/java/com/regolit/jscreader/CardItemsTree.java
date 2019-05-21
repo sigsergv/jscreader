@@ -3,15 +3,15 @@
 package com.regolit.jscreader;
 
 import com.regolit.jscreader.util.Util;
+import com.regolit.jscreader.util.BerTlv;
 import com.regolit.jscreader.util.CandidateApplications;
 import com.regolit.jscreader.event.ChangeEvent;
 import com.regolit.jscreader.event.CardInsertedListener;
 import com.regolit.jscreader.event.CardRemovedListener;
 
-import com.regolit.jscreader.model.CardItemRootModel;
-import com.regolit.jscreader.model.CardItemAdfModel;
-import com.regolit.jscreader.model.CardItemGeneralInformationModel;
+import com.regolit.jscreader.model.*;
 
+import java.util.ArrayList;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
 import javafx.application.Platform;
@@ -73,6 +73,72 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 // insert node with master DF information
             }
 
+            var discoveredApps = new ArrayList<byte[]>(5);
+
+            // try EMV objects
+
+            // select PSE: "1PAY.SYS.DDF01"
+            //                                          CLA  INS  P1 P2   Lc  Data
+            byte[] selectPSECommand = Util.toByteArray("00   A4   04 00   0E  31 50 41 59 2E 53 59 53 2E 44 44 46 30 31");
+            answer = channel.transmit(new CommandAPDU(selectPSECommand));
+            if (answer.getSW() == 0x9000) {
+                // add PSE node
+                var pseFciData = answer.getData();
+                var pseInfo = new CardItemFCIModel("EMV PSE: 1PAY.SYS.DDF01", pseFciData);
+                var pseNode = new TreeItem<CardItemRootModel>(pseInfo);
+                pseNode.setExpanded(true);
+
+                try {
+                    BerTlv tlvRoot = BerTlv.parseBytes(pseFciData);
+                    root.getChildren().add(pseNode);
+
+                    // find registered applications
+                    var piTlv = tlvRoot.getPart("A5");
+                    if (piTlv != null) {
+                        // piTlv now contains data specified in EMV_v4.3 book 1 spec,
+                        // section "11.3.4 Data Field Returned in the Response Message"
+                        var sfiTlv = piTlv.getPart("88");
+                        if (sfiTlv != null) {
+                            var defSfiData = sfiTlv.getValue();
+                            int sfi = defSfiData[0];
+
+                            // TODO: move this code to separate method
+                            var sfiRecords = new ArrayList<byte[]>();
+                            // read all records from this file
+                            // READ RECORD, see ISO/IEC 7816-4, section "7.3.3 READ RECORD (S) command"
+                            //                                           CLA INS P1 P2  Le
+                            byte[] readRecordCommand = Util.toByteArray("00  B2  00 00  00");
+                            // read single record specified in P1 from EF with short EF identifier sfi
+                            byte p2 = (byte)((sfi << 3) | 4);
+                            readRecordCommand[3] = p2;
+                            byte recordNumber = 1;
+                            byte expectedLength = 0;
+                            while (true) {
+                                readRecordCommand[2] = recordNumber;
+                                readRecordCommand[4] = expectedLength;
+                                answer = channel.transmit(new CommandAPDU(readRecordCommand));
+                                if (answer.getSW1() == 0x6C) {
+                                    expectedLength = (byte)answer.getSW2();
+                                    continue;
+                                }
+                                if (answer.getSW() != 0x9000) {
+                                    break;
+                                }
+                                sfiRecords.add(answer.getData());
+                                recordNumber++;
+                            }
+
+
+                            var sfiInfo = new CardItemSFIModel(String.format("SFI=%d", sfi), sfiRecords);
+                            var sfiNode = new TreeItem<CardItemRootModel>(sfiInfo);
+                            pseNode.getChildren().add(sfiNode);
+                        }
+                    }
+                } catch (BerTlv.ParsingException e) {
+                } catch (BerTlv.ConstraintException e) {
+                }
+            }
+
             // walk through list of known apps
             var cap = CandidateApplications.getInstance();
             //                                                  CLA INS P1 P2
@@ -84,10 +150,10 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 answer = channel.transmit(new CommandAPDU(cmd));
                 if (answer.getSW() == 0x9000) {
                     // insert found ADF info
-                    var adfInfo = new CardItemAdfModel(String.format("ADF (AID=%s)", Util.hexify(x.aid)), x.aid, x.type, x.name);
-                    var tn = new TreeItem<CardItemRootModel>(adfInfo);
-                    root.getChildren().add(tn);
-                    // System.out.printf("FOUND: %s\n", Util.hexify(cmd));
+                    var adfInfo = new CardItemAdfFCIModel(String.format("ADF (AID=%s)", Util.hexify(x.aid)), 
+                        answer.getData(), x.aid, x.type, x.name);
+                    var adfNode = new TreeItem<CardItemRootModel>(adfInfo);
+                    root.getChildren().add(adfNode);
                 }
             }
 

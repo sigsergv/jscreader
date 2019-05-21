@@ -158,6 +158,7 @@ final class DeviceManager {
                             } else {
                                 fireCardRemovedEvent();
                             }
+                            selectedTerminalCardInserted = p;
                         }
                     }
                 }
@@ -197,47 +198,4 @@ final class DeviceManager {
             }
         }
     }
-    
-
-    // these two methods below are really required, because current implementation of PCSCTerminals.java
-    // uses single SCARDCONTEXT for all threads/terminals
-    // private boolean terminalWaitForCardPresent(CardTerminal terminal, long timeout)
-    //     throws CardException
-    // {
-    //     if (timeout == 0) {
-    //         timeout = 3600000;  // one hour
-    //     }
-    //     long limitTime = System.currentTimeMillis() + timeout;
-
-    //     while (true) {
-    //         if (System.currentTimeMillis() > limitTime) {
-    //             return false;
-    //         }
-    //         if (terminal.waitForCardPresent(1000) == false) {
-    //             continue;
-    //         } else {
-    //             return true;
-    //         }
-    //     }
-    // }
-
-    // private boolean terminalWaitForCardAbsent(CardTerminal terminal, long timeout)
-    //     throws CardException
-    // {
-    //     if (timeout == 0) {
-    //         timeout = 3600000;  // one hour
-    //     }
-    //     long limitTime = System.currentTimeMillis() + timeout;
-
-    //     while (true) {
-    //         if (System.currentTimeMillis() > limitTime) {
-    //             return false;
-    //         }
-    //         if (terminal.waitForCardAbsent(1000) == false) {
-    //             continue;
-    //         } else {
-    //             return true;
-    //         }
-    //     }
-    // }
 }
