@@ -183,8 +183,8 @@ public class ATR {
     }
 
     private static String parseHistoricalBytesValue(int tag, byte[] value) {
-        System.out.printf("  TAG: %02X; DATA: %s%n", tag, Util.hexify(value));
         var sb = new StringBuilder(500);
+        sb.append(String.format("  TAG: %02X; DATA: %s%n", tag, Util.hexify(value)));
 
         // print additional details
         byte b;
