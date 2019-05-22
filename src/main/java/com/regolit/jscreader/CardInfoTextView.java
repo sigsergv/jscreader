@@ -5,8 +5,10 @@ package com.regolit.jscreader;
 import com.regolit.jscreader.util.Util;
 import com.regolit.jscreader.util.ATR;
 import com.regolit.jscreader.util.BerTlv;
+import com.regolit.jscreader.util.SimpleTlv;
 import com.regolit.jscreader.model.*;
 
+import java.util.Map;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TextArea;
 import javafx.beans.value.ObservableValue;
@@ -28,6 +30,7 @@ class CardInfoTextView extends TextArea {
                     return;
                 }
 
+                // a lot of bs code...
                 var nodeValue = ((TreeItem)newValue).getValue();
                 if (nodeValue instanceof CardItemGeneralInformationModel) {
                     processValue((CardItemGeneralInformationModel)nodeValue);
@@ -37,6 +40,8 @@ class CardInfoTextView extends TextArea {
                     processValue((CardItemAdfFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemFCIModel) {
                     processValue((CardItemFCIModel)nodeValue);
+                } else if (nodeValue instanceof CardItemPGPModel) {
+                    processValue((CardItemPGPModel)nodeValue);
                 }
                 // System.out.println(nodeValue.getClass().getName());
                 // processValue(nodeValue);
@@ -74,6 +79,7 @@ class CardInfoTextView extends TextArea {
         processValue((CardItemRootModel)value);
 
         var sb = new StringBuilder(getText());
+
         try {
             var root = BerTlv.parseBytes(value.fciData);
             sb.append("Decoded BER-TLV data:\n");
@@ -82,16 +88,101 @@ class CardInfoTextView extends TextArea {
         // } catch (BerTlv.ConstraintException e) {
         //     sb.append(String.format("Failed to parse FCI data: %s\n", e));
         } catch (BerTlv.ParsingException e) {
-            sb.append(String.format("Failed to parse FCI data: %s\n", e));
+            // sb.append(String.format("Failed to parse FCI data: %s\n", e));
+            sb.append("Failed to decode data as FCI object.\n\n");
+
+            sb.append(String.format("Raw data: %s\n", Util.hexify(value.fciData)));
         }
         setText(sb.toString());
     }
 
     private void processValue(CardItemAdfFCIModel value) {
-        processValue((CardItemFCIModel)value);
+        if (value.type == ApplicationInfoModel.TYPE.YK) {
+            processValue((CardItemRootModel)value);
+            // special processing of Yubikey
+            // see https://developers.yubico.com/OATH/YKOATH_Protocol.html
+            var sb = new StringBuilder(getText());
+            sb.append("Yubikey application.\n");
+            sb.append("Challenge data:\n");
+            if (value.fciData[0] == 0x79) {
+                try {
+                    for (SimpleTlv part: SimpleTlv.parseBytes(value.fciData)) {
+                        switch (part.getTag()) {
+                        case 0x79:
+                            sb.append(String.format("  Version: %s\n", Util.hexify(part.getValue())));
+                            break;
+                        case 0x71:
+                            sb.append(String.format("  Name: %s\n", Util.hexify(part.getValue())));
+                            break;
+                        case 0x74:
+                            sb.append(String.format("  Challenge: %s\n", Util.hexify(part.getValue())));
+                            break;
+                        case 0x7B:
+                            sb.append(String.format("  Algorithm: %s\n", Util.hexify(part.getValue())));
+                            break;
+                        default:
+                            sb.append(String.format("  Unknown block (0x%02X): %s\n", 
+                                part.getTag(), Util.hexify(part.getValue())));
+                        }
+                    }
+                } catch (SimpleTlv.ParsingException e) {
+                    sb.append("SIMPLE-TLV parse failed.\n");
+                    sb.append(String.format("Raw data: %s\n", Util.hexify(value.fciData)));
+                }
+            } else {
+                sb.append("Failed to parse YKOATH SELECT instruction result.\n");
+                sb.append(String.format("Raw data: %s\n", Util.hexify(value.fciData)));
+            }
+            setText(sb.toString());
+        } else {
+            processValue((CardItemFCIModel)value);
+
+            var sb = new StringBuilder(getText());
+            sb.append(String.format("Application name: %s%n", value.name));
+            setText(sb.toString());
+        }
+    }
+
+    private void processValue(CardItemPGPModel value) {
+        processValue((CardItemRootModel)value);
 
         var sb = new StringBuilder(getText());
-        sb.append(String.format("Application name: %s%n", value.name));
+        sb.append("OpenPGP data objects:\n\n");
+        var iter = value.dataObjects.entrySet().iterator();
+
+        while (iter.hasNext()) {
+            Map.Entry pair = (Map.Entry)iter.next();
+
+            switch ((String)pair.getKey()) {
+            case "4F":
+                sb.append(String.format("Full AID: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "5F 52":
+                sb.append(String.format("Historical bytes: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "C4":
+                sb.append(String.format("PW status bytes: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "6E":
+                sb.append(String.format("Application Related Data: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "7F 74":
+                sb.append(String.format("General feature management: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "5E":
+                sb.append(String.format("Login data: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "65":
+                sb.append(String.format("Cardholder Related Data: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "5F 50":
+                sb.append(String.format("URL: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            case "7A":
+                sb.append(String.format("Security support template: %s\n", Util.hexify((byte[])pair.getValue())));
+                break;
+            }
+        }
         setText(sb.toString());
     }
 

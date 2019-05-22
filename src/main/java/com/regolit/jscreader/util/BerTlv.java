@@ -214,11 +214,7 @@ public class BerTlv {
                     throw new ParsingException(String.format("Length value is too large: %d, byte: %02X", lengthBytesLen, bytes[p]));
                 }
                 for (int i=0; i<localLen; i++) {
-                    int x = bytes[p+i+1];
-                    if (x < 0) {
-                        // we use this code because all Java types are signed
-                        x += 256;
-                    }
+                    int x = Util.unsignedByte(bytes[p+i+1]);
                     length = length*256 + x;
                 }
             }

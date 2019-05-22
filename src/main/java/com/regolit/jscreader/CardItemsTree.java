@@ -2,6 +2,7 @@
 
 package com.regolit.jscreader;
 
+import com.regolit.jscreader.util.APDU;
 import com.regolit.jscreader.util.Util;
 import com.regolit.jscreader.util.BerTlv;
 import com.regolit.jscreader.util.CandidateApplications;
@@ -12,11 +13,13 @@ import com.regolit.jscreader.event.CardRemovedListener;
 import com.regolit.jscreader.model.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
 import javafx.application.Platform;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CommandAPDU;
+
 
 class CardItemsTree extends TreeView<CardItemRootModel>
     implements CardInsertedListener, CardRemovedListener
@@ -71,9 +74,37 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             var answer = channel.transmit(new CommandAPDU(selectMFCommand));
             if (answer.getSW() == 0x9000) {
                 // insert node with master DF information
+            } else {
+                // System.out.printf("SW: %04X", answer.getSW());
             }
 
             var discoveredApps = new ArrayList<byte[]>(5);
+
+            // try Open PGP application
+            byte[] selectPgpCommand = Util.toByteArray("00   A4   04 00  06 D2 76 00 01 24 01");
+            answer = channel.transmit(new CommandAPDU(selectPgpCommand));
+            if (answer.getSW() == 0x9000) {
+                // insert node with openpgp app info
+                var dataObjects = new HashMap<String, byte[]>(10);
+                String[] tags = {"4F", "5F 52", "C4", "6E", "7F 74", "5E", "65", "5F 50", "7A"};
+                for (var t : tags) {
+                    byte[] d = APDU.readOpenPgpDataObject(channel, t);
+                    if (d == null) {
+                        continue;
+                    }
+                    dataObjects.put(t, d);
+                }
+
+                var adfInfo = new CardItemPGPModel("OpenPGP (AID=D2 76 00 01 24 01", dataObjects);
+                var adfNode = new TreeItem<CardItemRootModel>(adfInfo);
+                // adfNode.setExpanded(true);
+                root.getChildren().add(adfNode);
+
+
+
+            } else {
+                // System.out.printf("SW: %04X", answer.getSW());
+            }
 
             // try EMV objects
 
@@ -140,10 +171,9 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             }
 
             // walk through list of known apps
-            var cap = CandidateApplications.getInstance();
             //                                                  CLA INS P1 P2
             byte[] selectAppCommandTemplate = Util.toByteArray("00  A4  04 00");
-            for (var x : cap.list()) {
+            for (var x : CandidateApplications.getInstance().list()) {
                 byte[] cmdLcPart = {(byte)x.aid.length};
                 var cmdAidPart = Util.concatArrays(cmdLcPart, x.aid);
                 var cmd = Util.concatArrays(selectAppCommandTemplate, cmdAidPart);

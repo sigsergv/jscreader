@@ -76,4 +76,12 @@ public class Util {
 
         return copyArray(buf, 0, bufLen);
     }
+
+    public static int unsignedByte(byte b) {
+        int i = b;
+        if (i < 0) {
+            i += 256;
+        }
+        return i;
+    }
 }
