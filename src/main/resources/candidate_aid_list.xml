@@ -7,13 +7,14 @@
 
 	Each "application" node has required attribute "aid" that contains AID value (byte values could be separated
 	by any number of optional spaces). "type" attribute is required too and should contain one of the following
-	values: "emv", "unknown", TBC.
+	values: "emv", "unknown", "yk" TBC.
 -->
 
 <applications>
 	<application aid="A0 00 00 00 03  20 10" type="emv" name="Visa Electron"/>
 	<application aid="A0 00 00 00 03  10 10" type="emv" name="Visa Classic"/>
 	<application aid="A0 00 00 00 04  10 10" type="emv" name="Mastercard"/>
-	<application aid="a0 00 00 05 27  21 01" type="unknown" name="Yubikey app"/>
+	<application aid="a0 00 00 05 27  21 01" type="yk" name="Yubikey app"/>  <!--yubikey-->
+	<!-- <application aid="A0 00 00 06 17  00 94 C3 CD 60 01 01" type="unknown" name="FIDESMO AID"/> -->
 
 </applications>
