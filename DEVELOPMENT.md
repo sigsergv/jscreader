@@ -14,6 +14,10 @@ Run project:
 
     ./gradlew run
 
+Create binary distribution (still requires external JRE/JDK):
+
+    ./gradlew distZip
+
 
 APIs and manuals
 ================
