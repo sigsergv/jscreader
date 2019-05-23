@@ -70,12 +70,15 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             // P1=0 "select MF, DF or EF"
             // P2=0 "return FCI template"
             //                                         CLA INS P1 P2 Lc 
-            byte[] selectMFCommand = Util.toByteArray("00  A4  00 00 02  3F 00");
+            byte[] selectMFCommand = Util.toByteArray("00  A4  00 00 02  3F 00 00");
             var answer = channel.transmit(new CommandAPDU(selectMFCommand));
             if (answer.getSW() == 0x9000) {
                 // insert node with master DF information
+                var mfInfo = new CardItemFCIModel("MF", answer.getData());
+                var mfNode = new TreeItem<CardItemRootModel>(mfInfo);
+                root.getChildren().add(mfNode);
             } else {
-                // System.out.printf("SW: %04X", answer.getSW());
+                System.out.printf("MF SW: %04X\n", answer.getSW());
             }
 
             var discoveredApps = new ArrayList<byte[]>(5);
@@ -99,9 +102,6 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 var adfNode = new TreeItem<CardItemRootModel>(adfInfo);
                 // adfNode.setExpanded(true);
                 root.getChildren().add(adfNode);
-
-
-
             } else {
                 // System.out.printf("SW: %04X", answer.getSW());
             }
@@ -158,7 +158,6 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                                 sfiRecords.add(answer.getData());
                                 recordNumber++;
                             }
-
 
                             var sfiInfo = new CardItemSFIModel(String.format("SFI=%d", sfi), sfiRecords);
                             var sfiNode = new TreeItem<CardItemRootModel>(sfiInfo);
