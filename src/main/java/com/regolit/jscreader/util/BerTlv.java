@@ -89,17 +89,17 @@ public class BerTlv {
     }
 
 
-    /**
-     * Add new BerTlv part to constructed
-     * 
-     * @param  part [description]
-     * @return      [description]
-     */
-    public BerTlv addPart(BerTlv part)
-        throws ConstraintException
-    {
-        return this;
-    }
+    // /**
+    //  * Add new BerTlv part to constructed
+    //  * 
+    //  * @param  part [description]
+    //  * @return      [description]
+    //  */
+    // public BerTlv addPart(BerTlv part)
+    //     throws ConstraintException
+    // {
+    //     return this;
+    // }
 
 
     /**

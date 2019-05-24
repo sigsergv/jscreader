@@ -145,7 +145,6 @@ final class DeviceManager {
                     if (selectedTerminalCardInserted == null) {
                         // i.e. there is no information about status
                         selectedTerminalCardInserted = t.isCardPresent();
-                        System.out.printf("New card information: %s\n", selectedTerminalCardInserted);
                         if (selectedTerminalCardInserted) {
                             fireCardInsertedEvent();
                         }

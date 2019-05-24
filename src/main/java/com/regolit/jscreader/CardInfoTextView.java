@@ -164,7 +164,7 @@ class CardInfoTextView extends TextArea {
                 sb.append(String.format("PW status bytes: %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "6E":
-                sb.append(String.format("Application Related Data: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("Application Related Data:\n %s\n", Util.hexify((byte[])pair.getValue(), 16)));
                 break;
             case "7F 74":
                 sb.append(String.format("General feature management: %s\n", Util.hexify((byte[])pair.getValue())));

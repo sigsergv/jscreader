@@ -67,8 +67,6 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             var channel = card.getBasicChannel();
 
             // try to select MF
-            // P1=0 "select MF, DF or EF"
-            // P2=0 "return FCI template"
             //                                         CLA INS P1 P2 Lc 
             byte[] selectMFCommand = Util.toByteArray("00  A4  00 00 02  3F 00 00");
             var answer = channel.transmit(new CommandAPDU(selectMFCommand));
@@ -78,12 +76,25 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 var mfNode = new TreeItem<CardItemRootModel>(mfInfo);
                 root.getChildren().add(mfNode);
             } else {
-                System.out.printf("MF SW: %04X\n", answer.getSW());
+                System.out.printf("No MF, SW: %04X\n", answer.getSW());
+            }
+
+            // try to select EF.DIR
+            //                                         CLA INS P1 P2 Lc 
+            byte[] selectEFDIRCommand = Util.toByteArray("00  A4  00 00 02  2F 01 00");
+            answer = channel.transmit(new CommandAPDU(selectEFDIRCommand));
+            if (answer.getSW() == 0x9000) {
+                // insert node with master DF information
+                var efInfo = new CardItemFCIModel("EF.DIR", answer.getData());
+                var efNode = new TreeItem<CardItemRootModel>(efInfo);
+                root.getChildren().add(efNode);
+            } else {
+                System.out.printf("No MF, SW: %04X\n", answer.getSW());
             }
 
             var discoveredApps = new ArrayList<byte[]>(5);
 
-            // try Open PGP application
+            // try OpenPGP application
             byte[] selectPgpCommand = Util.toByteArray("00   A4   04 00  06 D2 76 00 01 24 01");
             answer = channel.transmit(new CommandAPDU(selectPgpCommand));
             if (answer.getSW() == 0x9000) {

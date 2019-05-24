@@ -20,6 +20,27 @@ public class Util {
         return String.join(" ", bytesStrings);
     }
 
+    /**
+     * Convert byte array to HEX representation: "XX XX XX XX ..." wrapped at position "wrap"
+     * 
+     * @param  bytes [description]
+     * @param  int  
+     * @return       [description]
+     */
+    public static String hexify(byte[] bytes, int wrap) {
+        ArrayList<String> bytesStrings = new ArrayList<String>(bytes.length);
+        int i = 1;
+        for (byte b : bytes) {
+            if ((i % wrap) == 0) {
+                bytesStrings.add(String.format("%02X\n", b));
+            } else {
+                bytesStrings.add(String.format("%02X", b));
+            }
+            i++;
+        }
+        return String.join(" ", bytesStrings);
+    }
+
     public static String bytesToString(byte[] bytes) {
         try {
             return new String(bytes, "ISO-8859-1");

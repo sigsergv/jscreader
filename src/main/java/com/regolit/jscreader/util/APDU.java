@@ -30,7 +30,7 @@ public class APDU {
         byte[] cmd = Util.toByteArray("00 CA 00 00 00");
         cmd[2] = p1;
         cmd[3] = p2;
-        System.out.printf("%s\n", Util.hexify(cmd));
+
         try {
             var answer = channel.transmit(new CommandAPDU(cmd));
             if (answer.getSW() != 0x9000) {
