@@ -53,8 +53,8 @@ class CardInfoTextView extends TextArea {
         processValue((CardItemRootModel)value);
 
         var sb = new StringBuilder(getText());
-        sb.append(String.format("ATR: %s%n", Util.hexify(value.ATR)));
-        var atr = new ATR(value.ATR);
+        sb.append(String.format("ATR: %s%n", Util.hexify(value.getAtr())));
+        var atr = new ATR(value.getAtr());
         sb.append(atr.parseToText());
         sb.append("\n");
         setText(sb.toString());
@@ -188,7 +188,7 @@ class CardInfoTextView extends TextArea {
 
     private void processValue(CardItemRootModel value) {
         var text = "";
-        text += value.title + "\n\n";
+        text += value.getTitle() + "\n\n";
         setText(text);
     }
 }

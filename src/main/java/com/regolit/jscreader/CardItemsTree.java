@@ -19,6 +19,7 @@ import javafx.scene.control.TreeItem;
 import javafx.application.Platform;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CommandAPDU;
+import javax.smartcardio.ResponseAPDU;
 
 
 class CardItemsTree extends TreeView<CardItemRootModel>
@@ -57,19 +58,18 @@ class CardItemsTree extends TreeView<CardItemRootModel>
         // "General information" node
         try {
             var card = terminal.connect("*");
-            var cardGeneralInfo = new CardItemGeneralInformationModel("General Information");
-            cardGeneralInfo.ATR = card.getATR().getBytes();
-
+            var cardGeneralInfo = new CardItemGeneralInformationModel("General Information",
+                card.getATR().getBytes());
             var generalInformationNode = new TreeItem<CardItemRootModel>(cardGeneralInfo);
             root.getChildren().add(generalInformationNode);
 
             // other nodes
             var channel = card.getBasicChannel();
+            ResponseAPDU answer;
 
             // try to select MF
-            //                                         CLA INS P1 P2 Lc 
-            byte[] selectMFCommand = Util.toByteArray("00  A4  00 00 02  3F 00 00");
-            var answer = channel.transmit(new CommandAPDU(selectMFCommand));
+            byte[] selectMFCommand = Util.toByteArray("00 A4 00 00 02 3F 00 00");
+            answer = channel.transmit(new CommandAPDU(selectMFCommand));
             if (answer.getSW() == 0x9000) {
                 // insert node with master DF information
                 var mfInfo = new CardItemFCIModel("MF", answer.getData());
@@ -91,6 +91,15 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             } else {
                 System.out.printf("No MF, SW: %04X\n", answer.getSW());
             }
+
+            // // try to read data from initially selected file
+            // byte[] getMFDataCommand = Util.toByteArray("00 CA 00 00 00");
+            // answer = channel.transmit(new CommandAPDU(getMFDataCommand));
+            // if (answer.getSW() == 0x9000) {
+            //     System.out.printf("MF DATA: %s\n", Util.hexify(answer.getData()));
+            // } else {
+            //     System.out.printf("No MF Data, SW=0x%04x\n", answer.getSW());
+            // }
 
             var discoveredApps = new ArrayList<byte[]>(5);
 
