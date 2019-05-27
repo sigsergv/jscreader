@@ -65,11 +65,21 @@ class CardItemsTree extends TreeView<CardItemRootModel>
 
             // other nodes
             var channel = card.getBasicChannel();
+            byte[] cmd; 
             ResponseAPDU answer;
 
+            // try to get initially selected application name
+            cmd = Util.toByteArray("00 CA 00 4F 00");
+            answer = channel.transmit(new CommandAPDU(cmd));
+            if (answer.getSW() == 0x9000) {
+                System.out.printf("Found initially selected app, AID=%s\n", Util.hexify(answer.getData()));
+            } else {
+                System.out.printf("No isap, SW: %04X\n", answer.getSW());
+            }
+
             // try to select MF
-            byte[] selectMFCommand = Util.toByteArray("00 A4 00 00 02 3F 00 00");
-            answer = channel.transmit(new CommandAPDU(selectMFCommand));
+            cmd = Util.toByteArray("00 A4 00 00 02 3F 00 00");
+            answer = channel.transmit(new CommandAPDU(cmd));
             if (answer.getSW() == 0x9000) {
                 // insert node with master DF information
                 var mfInfo = new CardItemFCIModel("MF", answer.getData());
@@ -81,8 +91,8 @@ class CardItemsTree extends TreeView<CardItemRootModel>
 
             // try to select EF.DIR
             //                                         CLA INS P1 P2 Lc 
-            byte[] selectEFDIRCommand = Util.toByteArray("00  A4  00 00 02  2F 01 00");
-            answer = channel.transmit(new CommandAPDU(selectEFDIRCommand));
+            cmd = Util.toByteArray("00  A4  00 00 02  2F 01 00");
+            answer = channel.transmit(new CommandAPDU(cmd));
             if (answer.getSW() == 0x9000) {
                 // insert node with master DF information
                 var efInfo = new CardItemFCIModel("EF.DIR", answer.getData());
@@ -103,9 +113,16 @@ class CardItemsTree extends TreeView<CardItemRootModel>
 
             var discoveredApps = new ArrayList<byte[]>(5);
 
+            // try yubikey app
+            cmd = Util.toByteArray("00   A4   04 00  07 a0 00 00 05 27 21 01");
+            answer = channel.transmit(new CommandAPDU(cmd));
+            if (answer.getSW() == 0x9000) {
+                System.out.printf("DATA: %s\n", Util.hexify(answer.getData()));
+            }
+
             // try OpenPGP application
-            byte[] selectPgpCommand = Util.toByteArray("00   A4   04 00  06 D2 76 00 01 24 01");
-            answer = channel.transmit(new CommandAPDU(selectPgpCommand));
+            cmd = Util.toByteArray("00   A4   04 00  06 D2 76 00 01 24 01");
+            answer = channel.transmit(new CommandAPDU(cmd));
             if (answer.getSW() == 0x9000) {
                 // insert node with openpgp app info
                 var dataObjects = new HashMap<String, byte[]>(10);
@@ -130,8 +147,8 @@ class CardItemsTree extends TreeView<CardItemRootModel>
 
             // select PSE: "1PAY.SYS.DDF01"
             //                                          CLA  INS  P1 P2   Lc  Data
-            byte[] selectPSECommand = Util.toByteArray("00   A4   04 00   0E  31 50 41 59 2E 53 59 53 2E 44 44 46 30 31");
-            answer = channel.transmit(new CommandAPDU(selectPSECommand));
+            cmd = Util.toByteArray("00   A4   04 00   0E  31 50 41 59 2E 53 59 53 2E 44 44 46 30 31");
+            answer = channel.transmit(new CommandAPDU(cmd));
             if (answer.getSW() == 0x9000) {
                 // add PSE node
                 var pseFciData = answer.getData();
@@ -158,16 +175,16 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                             // read all records from this file
                             // READ RECORD, see ISO/IEC 7816-4, section "7.3.3 READ RECORD (S) command"
                             //                                           CLA INS P1 P2  Le
-                            byte[] readRecordCommand = Util.toByteArray("00  B2  00 00  00");
+                            cmd = Util.toByteArray("00  B2  00 00  00");
                             // read single record specified in P1 from EF with short EF identifier sfi
                             byte p2 = (byte)((sfi << 3) | 4);
-                            readRecordCommand[3] = p2;
+                            cmd[3] = p2;
                             byte recordNumber = 1;
                             byte expectedLength = 0;
                             while (true) {
-                                readRecordCommand[2] = recordNumber;
-                                readRecordCommand[4] = expectedLength;
-                                answer = channel.transmit(new CommandAPDU(readRecordCommand));
+                                cmd[2] = recordNumber;
+                                cmd[4] = expectedLength;
+                                answer = channel.transmit(new CommandAPDU(cmd));
                                 if (answer.getSW1() == 0x6C) {
                                     expectedLength = (byte)answer.getSW2();
                                     continue;
@@ -191,11 +208,11 @@ class CardItemsTree extends TreeView<CardItemRootModel>
 
             // walk through list of known apps
             //                                                  CLA INS P1 P2
-            byte[] selectAppCommandTemplate = Util.toByteArray("00  A4  04 00");
+            var selectAppCommandTemplate = Util.toByteArray("00  A4  04 00");
             for (var x : CandidateApplications.getInstance().list()) {
                 byte[] cmdLcPart = {(byte)x.aid.length};
-                var cmdAidPart = Util.concatArrays(cmdLcPart, x.aid);
-                var cmd = Util.concatArrays(selectAppCommandTemplate, cmdAidPart);
+                cmd = Util.concatArrays(cmdLcPart, x.aid);
+                cmd = Util.concatArrays(selectAppCommandTemplate, cmd);
                 answer = channel.transmit(new CommandAPDU(cmd));
                 if (answer.getSW() == 0x9000) {
                     // insert found ADF info

@@ -14,7 +14,16 @@
 	<application aid="A0 00 00 00 03  20 10" type="emv" name="Visa Electron"/>
 	<application aid="A0 00 00 00 03  10 10" type="emv" name="Visa Classic"/>
 	<application aid="A0 00 00 00 04  10 10" type="emv" name="Mastercard"/>
-	<application aid="a0 00 00 05 27  21 01" type="yk" name="Yubikey app"/>  <!--yubikey-->
+	<application aid="A0 00 00 05 27  21 01" type="yk" name="Yubikey app"/>  <!--yubikey-->
+	<application aid="A0 00 00 03 08" type="unknown" name="Unknown"/> <!-- PIV AID -->
+	<application aid="A0 00 00 00 18  43 4D" type="unknown" name="Unknown"/>  <!-- card manager ? -->
+	<application aid="A0 00 00 00 03  00 00 00" type="unknown" name="Unknown"/> <!-- card manager ? -->
+	<application aid="A0 00 00 01 51  00 00" type="unknown" name="Unknown"/> <!-- card manager ? -->
+	<application aid="A0 00 00 05 27  20 01 01" type="unknown" name="Unknown"/> <!-- yubikey applet, https://gist.github.com/darconeous/ab835fd4bda7f99aa6dd -->
+	<application aid="D2 76 00 00 85  01 01" type="unknown" name="Unknown"/> <!-- NDEF ? -->
+	<application aid="D2 76 00 01 24  01" type="unknown" name="Unknown"/> <!-- ? -->
+	<application aid="A0 00 00 00 03  00 00 00" type="unknown" name="Unknown"/> <!-- ? -->
+	<application aid="A0 00 00 05 27  20 01" type="unknown" name="Yubikey something"/>  <!-- yubikey ? -->
 	<!-- <application aid="A0 00 00 06 17  00 94 C3 CD 60 01 01" type="unknown" name="FIDESMO AID"/> -->
 
 </applications>
