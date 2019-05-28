@@ -8,16 +8,17 @@ public class ApplicationInfoModel {
     public enum TYPE {
         EMV,
         YK,
-        PGP,
         UNKNOWN
     };
 
-    public final byte[] aid;
-    public final TYPE type;
-    public final String name;
+    private final byte[] aid;
+    private final TYPE type;
+    private final String name;
+    private final boolean enabled;
 
-    public ApplicationInfoModel(String aid, String type, String name) {
+    public ApplicationInfoModel(String aid, String type, String name, boolean enabled) {
         this.aid = Util.toByteArray(aid);
+        this.enabled = enabled;
         this.name = name;
         if (type.equals("emv")) {
             this.type = TYPE.EMV;
@@ -26,5 +27,22 @@ public class ApplicationInfoModel {
         } else {
             this.type = TYPE.UNKNOWN;
         }
+    }
+
+    public byte[] getAid() {
+        return aid;
+    }
+
+    public TYPE getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean getEnabled() {
+        return false;
+        // return enabled;
     }
 }

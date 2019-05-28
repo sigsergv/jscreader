@@ -9,6 +9,8 @@ import com.regolit.jscreader.util.SimpleTlv;
 import com.regolit.jscreader.model.*;
 
 import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TextArea;
 import javafx.beans.value.ObservableValue;
@@ -34,6 +36,8 @@ class CardInfoTextView extends TextArea {
                 var nodeValue = ((TreeItem)newValue).getValue();
                 if (nodeValue instanceof CardItemGeneralInformationModel) {
                     processValue((CardItemGeneralInformationModel)nodeValue);
+                } else if (nodeValue instanceof CardItemEmvSFIModel) {
+                    processValue((CardItemEmvSFIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemSFIModel) {
                     processValue((CardItemSFIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemAdfFCIModel) {
@@ -42,6 +46,8 @@ class CardInfoTextView extends TextArea {
                     processValue((CardItemFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemPGPModel) {
                     processValue((CardItemPGPModel)nodeValue);
+                } else if (nodeValue instanceof CardItemPSE1FCIModel) {
+                    processValue((CardItemPSE1FCIModel)nodeValue);
                 }
                 // System.out.println(nodeValue.getClass().getName());
                 // processValue(nodeValue);
@@ -62,15 +68,46 @@ class CardInfoTextView extends TextArea {
 
     private void processValue(CardItemSFIModel value) {
         processValue((CardItemRootModel)value);
+        var records = value.getRecords();
 
         var sb = new StringBuilder(getText());
         sb.append("Raw EF data\n\n");
-        sb.append(String.format("  Total records: %d\n", value.records.size()));
+        sb.append(String.format("  Total records: %d\n", records.size()));
 
-        var iter = value.records.listIterator();
+        var iter = records.listIterator();
         while (iter.hasNext()) {
             sb.append(String.format("    Record %d: %s\n", iter.nextIndex(), 
                 Util.hexify(iter.next())));
+        }
+        setText(sb.toString());
+    }
+
+    private void processValue(CardItemEmvSFIModel value) {
+        processValue((CardItemRootModel)value);
+        var sb = new StringBuilder(getText());
+        var readObjects = new ArrayList<BerTlv>(10);
+
+        for (var record : value.getRecords()) {
+            try {
+                var recordTlv = BerTlv.parseBytes(record);
+                if (!recordTlv.tagEquals("70")) {
+                    continue;
+                }
+                for (BerTlv p : recordTlv.getParts()) {
+                    readObjects.add(p);
+                }
+            } catch (BerTlv.ParsingException e) {
+                Util.errorLog("processValue(CardItemEmvSFIModel): failed to parse");
+            } catch (BerTlv.ConstraintException e) {
+                Util.errorLog("processValue(CardItemEmvSFIModel): failed to parse (constraint)");
+            }
+        }
+
+        var mappedValues = Util.mapEmvDataObjects(readObjects);
+
+        for (var b : readObjects) {
+            String tagString = Util.hexify(b.getTag());
+            sb.append(String.format("    %s\n", mappedValues.get(tagString)));
         }
         setText(sb.toString());
     }
@@ -184,6 +221,10 @@ class CardInfoTextView extends TextArea {
             }
         }
         setText(sb.toString());
+    }
+
+    private void processValue(CardItemPSE1FCIModel value) {
+        processValue((CardItemFCIModel)value);
     }
 
     private void processValue(CardItemRootModel value) {

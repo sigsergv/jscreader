@@ -37,12 +37,11 @@ public class CandidateApplications {
                     break;
                 }
                 var attrs = node.getAttributes();
+                boolean enabled = false;
+
                 var enabledNode = attrs.getNamedItem("enabled");
-                if (enabledNode == null) {
-                    continue;
-                }
-                if (!enabledNode.getNodeValue().equals("true")) {
-                    continue;
+                if (enabledNode != null && enabledNode.getNodeValue().equals("true")) {
+                    enabled = true;
                 }
                 var aidNode = attrs.getNamedItem("aid");
                 if (aidNode == null) {
@@ -57,7 +56,7 @@ public class CandidateApplications {
                 if (aidNode != null) {
                     name = nameNode.getNodeValue();
                 }
-                var m = new ApplicationInfoModel(aidNode.getNodeValue(), typeNode.getNodeValue(), name);
+                var m = new ApplicationInfoModel(aidNode.getNodeValue(), typeNode.getNodeValue(), name, enabled);
                 presetApps.add(m);
             }
 

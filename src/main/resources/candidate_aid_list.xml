@@ -12,7 +12,7 @@
 -->
 
 <applications>
-	<application aid="31 50 41 59 2E 53 59 53 2E 44 44 46 30 31" type="" name="Visa Payment System Environment - PSE (1PAY.SYS.DDF01)" description="" enabled="true"/>
+	<application aid="31 50 41 59 2E 53 59 53 2E 44 44 46 30 31" type="" name="Visa Payment System Environment - PSE (1PAY.SYS.DDF01)" description="" enabled="false"/>
 	<application aid="32 50 41 59 2E 53 59 53 2E 44 44 46 30 31" type="" name="Visa Proximity Payment System Environment - PPSE (2PAY.SYS.DDF01)" description="Visa payWave for Mobile" enabled="true"/>
 	<application aid="44 46 4D 46 41 2E 44 46 61 72 65 32 34 31 30 31" type="" name="DeviceFidelity In2Pay DFare applet" description="http://www.nfcworld.com/2010/11/24/35207/devicefidelity-adds-nfc-support-for-android-and-mifare/" enabled="true"/>
 	<application aid="A0 00 00 00 01 01" type="" name="MUSCLE Card Applet" description="(Unlicensed use of this RID. Proposal to use A000000323 instead)" enabled="true"/>
