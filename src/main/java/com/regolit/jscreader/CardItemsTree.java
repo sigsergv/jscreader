@@ -114,7 +114,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             var discoveredApps = new ArrayList<byte[]>(5);
 
             // try yubikey app
-            cmd = Util.toByteArray("00   A4   04 00  07 a0 00 00 05 27 21 01");
+            cmd = Util.toByteArray("00   A4   04 00  07 A0 00 00 05 27 21 01");
             answer = channel.transmit(new CommandAPDU(cmd));
             if (answer.getSW() == 0x9000) {
                 System.out.printf("DATA: %s\n", Util.hexify(answer.getData()));

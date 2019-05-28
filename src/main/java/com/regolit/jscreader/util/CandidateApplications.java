@@ -37,6 +37,13 @@ public class CandidateApplications {
                     break;
                 }
                 var attrs = node.getAttributes();
+                var enabledNode = attrs.getNamedItem("enabled");
+                if (enabledNode == null) {
+                    continue;
+                }
+                if (!enabledNode.getNodeValue().equals("true")) {
+                    continue;
+                }
                 var aidNode = attrs.getNamedItem("aid");
                 if (aidNode == null) {
                     continue;

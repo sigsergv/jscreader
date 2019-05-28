@@ -6,24 +6,275 @@
 	different applications offered. © Wikipedia
 
 	Each "application" node has required attribute "aid" that contains AID value (byte values could be separated
-	by any number of optional spaces). "type" attribute is required too and should contain one of the following
-	values: "emv", "unknown", "yk" TBC.
+	by any number of optional spaces).
+
+	Source: https://www.eftlab.com/index.php/site-map/knowledge-base/211-emv-aid-rid-pix
 -->
 
 <applications>
-	<application aid="A0 00 00 00 03  20 10" type="emv" name="Visa Electron"/>
-	<application aid="A0 00 00 00 03  10 10" type="emv" name="Visa Classic"/>
-	<application aid="A0 00 00 00 04  10 10" type="emv" name="Mastercard"/>
-	<application aid="A0 00 00 05 27  21 01" type="yk" name="Yubikey app"/>  <!--yubikey-->
-	<application aid="A0 00 00 03 08" type="unknown" name="Unknown"/> <!-- PIV AID -->
-	<application aid="A0 00 00 00 18  43 4D" type="unknown" name="Unknown"/>  <!-- card manager ? -->
-	<application aid="A0 00 00 00 03  00 00 00" type="unknown" name="Unknown"/> <!-- card manager ? -->
-	<application aid="A0 00 00 01 51  00 00" type="unknown" name="Unknown"/> <!-- card manager ? -->
-	<application aid="A0 00 00 05 27  20 01 01" type="unknown" name="Unknown"/> <!-- yubikey applet, https://gist.github.com/darconeous/ab835fd4bda7f99aa6dd -->
-	<application aid="D2 76 00 00 85  01 01" type="unknown" name="Unknown"/> <!-- NDEF ? -->
-	<application aid="D2 76 00 01 24  01" type="unknown" name="Unknown"/> <!-- ? -->
-	<application aid="A0 00 00 00 03  00 00 00" type="unknown" name="Unknown"/> <!-- ? -->
-	<application aid="A0 00 00 05 27  20 01" type="unknown" name="Yubikey something"/>  <!-- yubikey ? -->
-	<!-- <application aid="A0 00 00 06 17  00 94 C3 CD 60 01 01" type="unknown" name="FIDESMO AID"/> -->
-
+	<application aid="31 50 41 59 2E 53 59 53 2E 44 44 46 30 31" type="" name="Visa Payment System Environment - PSE (1PAY.SYS.DDF01)" description="" enabled="true"/>
+	<application aid="32 50 41 59 2E 53 59 53 2E 44 44 46 30 31" type="" name="Visa Proximity Payment System Environment - PPSE (2PAY.SYS.DDF01)" description="Visa payWave for Mobile" enabled="true"/>
+	<application aid="44 46 4D 46 41 2E 44 46 61 72 65 32 34 31 30 31" type="" name="DeviceFidelity In2Pay DFare applet" description="http://www.nfcworld.com/2010/11/24/35207/devicefidelity-adds-nfc-support-for-android-and-mifare/" enabled="true"/>
+	<application aid="A0 00 00 00 01 01" type="" name="MUSCLE Card Applet" description="(Unlicensed use of this RID. Proposal to use A000000323 instead)" enabled="true"/>
+	<application aid="A0 00 00 00 03 00 00 00" type="GP" name="(VISA) Card Manager" description="Used by most GP2.1.1 cards / Oberthur OP201 cards. Visa Proprietary Card Manager AID for OpenPlatform cards (visa.openplatform)." enabled="true"/>
+	<application aid="A0 00 00 00 03 00 03 75 61" type="" name="Bonuscard" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 05 07 60 10" type="emv" name="VISA ELO Credit" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 10 10" type="emv" name="VISA Debit/Credit (Classic)" description="Standard/Gold VISA credit card" enabled="true"/>
+	<application aid="A0 00 00 00 03 10 10 01" type="emv" name="VISA Credit" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 10 10 02" type="emv" name="VISA Debit" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 20 10" type="emv" name="VISA Electron" description="VISA Electron (Debit)" enabled="true"/>
+	<application aid="A0 00 00 00 03 20 20" type="emv" name="VISA" description="V PAY" enabled="true"/>
+	<application aid="A0 00 00 00 03 30 10" type="emv" name="VISA Interlink" description="VISA Interlink" enabled="true"/>
+	<application aid="A0 00 00 00 03 40 10" type="emv" name="VISA Specific" description="Visa Specific" enabled="true"/>
+	<application aid="A0 00 00 00 03 50 10" type="emv" name="VISA Specific" description="Visa Specific" enabled="true"/>
+	<application aid="A0 00 00 00 03 53 44 41" type="GP" name="Schlumberger Security Domain" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 53 50" type="GP" name="Security Domain" description="OCS Oberthur Card System Security Domain Package AID / VGP Card Manager (for ISD and ASD)" enabled="true"/>
+	<application aid="A0 00 00 00 03 53 50 41" type="GP" name="Security Domain" description="OCS Oberthur Card System Security Domain Applet AID / VGP Card Manager (for ISD and ASD)" enabled="true"/>
+	<application aid="A0 00 00 00 03 60 10" type="emv" name="Domestic Visa Cash Stored Value" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 60 20" type="emv" name="International Visa Cash Stored Value" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 80 02" type="emv" name="VISA Auth, VisaRemAuthen EMV-CAP (DPA)" description="VISA Auth dynamic passcode authentication (DPA). Used by Barclays/HBOS" enabled="true"/>
+	<application aid="A0 00 00 00 03 80 10" type="emv" name="VISA Plus" description="VISA plus" enabled="true"/>
+	<application aid="A0 00 00 00 03 90 10" type="emv" name="VISA Loyalty" description="" enabled="true"/>
+	<application aid="A0 00 00 00 03 99 99 10" type="emv" name="VISA Proprietary ATM" description="" enabled="true"/>
+	<application aid="A0 00 00 00 04 00 00" type="GP" name="MasterCard Card Manager" description="Security Domain" enabled="true"/>
+	<application aid="A0 00 00 00 04 01" type="emv" name="MasterCard PayPass" description="AEPM (Association Européenne Payez Mobile)" enabled="true"/>
+	<application aid="A0 00 00 00 04 10 10" type="emv" name="MasterCard Credit/Debit (Global)" description="Standard MasterCard" enabled="true"/>
+	<application aid="A0 00 00 00 04 10 10 12 13" type="emv" name="MasterCard Credit" description="Standard MasterCard" enabled="true"/>
+	<application aid="A0 00 00 00 04 10 10 12 15" type="emv" name="MasterCard Credit" description="Standard MasterCard" enabled="true"/>
+	<application aid="A0 00 00 00 04 10 10 BB 54 49 43 53 01" type="" name="[UNKNOWN]" description="Some co-branded card?" enabled="true"/>
+	<application aid="A0 00 00 00 04 20 10" type="emv" name="MasterCard Specific" description="MasterCard Specific" enabled="true"/>
+	<application aid="A0 00 00 00 04 22 03" type="" name="MasterCard Specific" description="MasterCard U.S. Maestro" enabled="true"/>
+	<application aid="A0 00 00 00 04 30 10" type="emv" name="MasterCard Specific" description="MasterCard Specific" enabled="true"/>
+	<application aid="A0 00 00 00 04 30 60" type="emv" name="Maestro (Debit)" description="Maestro (Debit) Card" enabled="true"/>
+	<application aid="A0 00 00 00 04 30 60 01" type="emv" name="Maestro (Debit)" description="Maestro (Debit) Card" enabled="true"/>
+	<application aid="A0 00 00 00 04 40 10" type="emv" name="MasterCard Specific" description="MasterCard Specific" enabled="true"/>
+	<application aid="A0 00 00 00 04 50 10" type="emv" name="MasterCard Specific" description="MasterCard Specific" enabled="true"/>
+	<application aid="A0 00 00 00 04 55 55" type="" name="APDULogger" description="AID on Cirrus Test Card" enabled="true"/>
+	<application aid="A0 00 00 00 04 60 00" type="emv" name="Cirrus" description="Mastercard Cirrus (Interbank Network) ATM card only" enabled="true"/>
+	<application aid="A0 00 00 00 04 80 02" type="emv" name="SecureCode Auth EMV-CAP" description="Chip Authentication Protocol (CAP). Works with NatWest or SecureCode Aut" enabled="true"/>
+	<application aid="A0 00 00 00 04 99 99" type="emv" name="MasterCard PayPass??" description="" enabled="true"/>
+	<application aid="A0 00 00 00 05 00 01" type="emv" name="Maestro UK" description="UK Domestic Maestro - Switch (debit card)" enabled="true"/>
+	<application aid="A0 00 00 00 05 00 02" type="emv" name="Solo" description="UK Domestic Maestro - Switch (debit card)" enabled="true"/>
+	<application aid="A0 00 00 00 09 00 01 FF 44 FF 12 89" type="" name="Orange" description="Orange UK" enabled="true"/>
+	<application aid="A0 00 00 00 10 10 30" type="" name="Maestro-CH" description="" enabled="true"/>
+	<application aid="A0 00 00 00 18 00" type="" name="Gemplus ?" description="" enabled="true"/>
+	<application aid="A0 00 00 00 18 10 01" type="" name="com.gemplus.javacard.util packages" description="" enabled="true"/>
+	<application aid="A0 00 00 00 18 43 4D" type="GP" name="Gemplus card manager" description="434D = CM (ascii). Security domain for some GCX/GXP cards (GemXpresso Pro) (Gemalto)" enabled="true"/>
+	<application aid="A0 00 00 00 18 43 4D 00" type="GP" name="Gemplus Security Domain" description="(Gemalto)" enabled="true"/>
+	<application aid="A0 00 00 00 24 01" type="emv" name="Self Service" description="" enabled="true"/>
+	<application aid="A0 00 00 00 25" type="emv" name="American Express" description="" enabled="true"/>
+	<application aid="A0 00 00 00 25 00 00" type="emv" name="American Express" description="American Express (Credit/Debit)" enabled="true"/>
+	<application aid="A0 00 00 00 25 01" type="emv" name="American Express" description="AEIPS-compliant (A-E contact EMV) payment application" enabled="true"/>
+	<application aid="A0 00 00 00 25 01 01 04" type="" name="American Express" description="" enabled="true"/>
+	<application aid="A0 00 00 00 25 01 04 02" type="emv" name="American Express" description="" enabled="true"/>
+	<application aid="A0 00 00 00 25 01 07 01" type="emv" name="ExpressPay" description="" enabled="true"/>
+	<application aid="A0 00 00 00 25 01 08 01" type="emv" name="American Express" description="" enabled="true"/>
+	<application aid="A0 00 00 00 29 10 10" type="emv" name="Link / American Express" description="Link (UK) ATM Network, or AMEX (Portugal?)" enabled="true"/>
+	<application aid="A0 00 00 00 29 45 08 75 10 10 00 00" type="" name="CO-OP" description="" enabled="true"/>
+	<application aid="A0 00 00 00 29 49 03 40 10 10 00 01" type="" name="HSBC" description="" enabled="true"/>
+	<application aid="A0 00 00 00 29 49 28 20 10 10 00 00" type="" name="Barclay" description="" enabled="true"/>
+	<application aid="A0 00 00 00 29 56 41 82" type="" name="HAFX" description="" enabled="true"/>
+	<application aid="A0 00 00 00 30 29 05 70 00 AD 13 10 01 01 FF" type="" name="BelPIC (Belgian Personal Identity Card) JavaCard Applet" description="Schlumberger (Gemalto) RID" enabled="true"/>
+	<application aid="A0 00 00 00 30 80 00 00 00 00 28 01 01" type="" name="Gemalto .NET Card AID" description="" enabled="true"/>
+	<application aid="A0 00 00 00 42 10 10" type="emv" name="Cartes Bancaire EMV Card" description="Groupement des Cartes Bancaires (France)" enabled="true"/>
+	<application aid="A0 00 00 00 42 20 10" type="emv" name="" description="" enabled="true"/>
+	<application aid="A0 00 00 00 42 30 10" type="emv" name="" description="" enabled="true"/>
+	<application aid="A0 00 00 00 42 40 10" type="emv" name="" description="" enabled="true"/>
+	<application aid="A0 00 00 00 42 50 10" type="emv" name="" description="" enabled="true"/>
+	<application aid="A0 00 00 00 42 60 10" type="emv" name="Contactless payment using Apple Pay" description="" enabled="true"/>
+	<application aid="A0 00 00 00 59 45 43 01 00" type="" name="Girocard Electronic Cash" description="" enabled="true"/>
+	<application aid="A0 00 00 00 63 50 4B 43 53 2D 31 35" type="" name="PKCS-15" description="RSA PKCS-15 PKI application (Predecessor to ISO7816-15) / ID-card in Finland" enabled="true"/>
+	<application aid="A0 00 00 00 63 57 41 50 2D 57 49 4D" type="" name="WAP-WIM" description="WAP (Wireless Application Protocol) Identity Module / Wireless Identification Module" enabled="true"/>
+	<application aid="A0 00 00 00 65 10" type="emv" name="JCB" description="Japan Credit Bureau" enabled="true"/>
+	<application aid="A0 00 00 00 65 10 10" type="emv" name="JCB J Smart Credit" description="Japan Credit Bureau" enabled="true"/>
+	<application aid="A0 00 00 00 69 00" type="emv" name="Moneo" description="" enabled="true"/>
+	<application aid="A0 00 00 00 77 01 00 00 02 10 00 00 00 00 00 3B" type="emv" name="Visa AEPN" description="" enabled="true"/>
+	<application aid="A0 00 00 00 79 01 00" type="" name="CACv2 PKI ID" description="Identity Key" enabled="true"/>
+	<application aid="A0 00 00 00 79 01 01" type="" name="CACv2 PKI Sign" description="Digital Signature Key" enabled="true"/>
+	<application aid="A0 00 00 00 79 01 02" type="" name="CACv2 PKI Enc" description="Key Management Key" enabled="true"/>
+	<application aid="A0 00 00 00 79 01 F0" type="" name="CACv1 PKI Identity Key" description="Re-directs to CACv2 PKI Identity key" enabled="true"/>
+	<application aid="A0 00 00 00 79 01 F1" type="" name="CACv1 PKI Digital Signature Key" description="Re-directs to CACv2 Digital Signature key" enabled="true"/>
+	<application aid="A0 00 00 00 79 01 F2" type="" name="CACv1 PKI Key Management Key" description="Re-directs to CACv2 Key Management key" enabled="true"/>
+	<application aid="A0 00 00 00 79 02 00" type="" name="CACv2 DoD Person" description="DoD Demographic" enabled="true"/>
+	<application aid="A0 00 00 00 79 02 01" type="" name="CACv2 DoD Personnel" description="DoD Demographic" enabled="true"/>
+	<application aid="A0 00 00 00 79 02 FB" type="" name="CACv1 BC" description="General Configuration" enabled="true"/>
+	<application aid="A0 00 00 00 79 02 FD" type="" name="CACv1 BC" description="PKI Certificate Attributes" enabled="true"/>
+	<application aid="A0 00 00 00 79 02 FE" type="" name="CACv1 BC" description="PKI Cert" enabled="true"/>
+	<application aid="A0 00 00 00 79 03 00" type="" name="CACv2 Access Control Applet" description="CAC PIN / ID PIN Management Applet" enabled="true"/>
+	<application aid="A0 00 00 00 79 12 01" type="" name="CAC JDM" description="Joint Data Model. BCAdmin" enabled="true"/>
+	<application aid="A0 00 00 00 79 12 02" type="" name="CAC JDM" description="Joint Data Model. BCMedical" enabled="true"/>
+	<application aid="A0 00 00 00 87 10 02 FF 49 FF 05 89" type="USIM" name="Telenor USIM" description="" enabled="true"/>
+	<application aid="A0 00 00 00 88 10 20 01 05 C1 00" type="BuyPass" name="BuyPass BIDA" description="Used by norwegian public betting company Norsk-Tipping?" enabled="true"/>
+	<application aid="A0 00 00 00 88 10 22 01 03 42 21" type="BuyPass" name="BuyPass BEID (BuyPass Electronic ID?)" description="" enabled="true"/>
+	<application aid="A0 00 00 00 88 10 22 01 03 43 21" type="BuyPass" name="BuyPass BEID (BuyPass Electronic ID?)" description="" enabled="true"/>
+	<application aid="A0 00 00 00 96 02 00" type="GP" name="Proton World International Security Domain" description="Proton, which is owned in part by Visa International and American Express Co., is in three other European countries: the original Proton program in Belgium, Chipknip in the Netherlands, and Cash in Switzerland" enabled="true"/>
+	<application aid="A0 00 00 00 98" type="emv" name="Debit Card" description="Bank of America Debit Card" enabled="true"/>
+	<application aid="A0 00 00 00 98 08 40" type="" name="Visa Common Debit" description="" enabled="true"/>
+	<application aid="A0 00 00 00 98 08 48" type="emv" name="Debit Card" description="Schwab Bank Debit Card" enabled="true"/>
+	<application aid="A0 00 00 01 11 01 01" type="" name="Postcard" description="" enabled="true"/>
+	<application aid="A0 00 00 01 16 03 00" type="" name="PIV CHUID" description="CHUID" enabled="true"/>
+	<application aid="A0 00 00 01 16 60 10" type="" name="PIV Fingerprints" description="Fingerprints" enabled="true"/>
+	<application aid="A0 00 00 01 16 60 30" type="" name="PIV Facial Image" description="Facial Image" enabled="true"/>
+	<application aid="A0 00 00 01 16 90 00" type="" name="PIV Security Object" description="Security Object" enabled="true"/>
+	<application aid="A0 00 00 01 16 A0 01" type="" name="PIV Authentication Key" description="PIV Authentication Key" enabled="true"/>
+	<application aid="A0 00 00 01 16 DB 00" type="" name="CCC" description="Card Capability Container" enabled="true"/>
+	<application aid="A0 00 00 01 18 01 00 00" type="" name="DF_Verkehr" description="Domestic Loyalty Program (Version 1.3)" enabled="true"/>
+	<application aid="A0 00 00 01 18 02 00 00" type="" name="DF_Partner" description="Domestic Loyalty Program (Version 1.3)" enabled="true"/>
+	<application aid="A0 00 00 01 18 03 00 00" type="" name="DF_Schülerdaten" description="Domestic Loyalty Program (Version 1.3)" enabled="true"/>
+	<application aid="A0 00 00 01 18 04 00 00" type="" name="DF_KEP_SIG" description="Domestic Loyalty Program (Version 1.32)" enabled="true"/>
+	<application aid="A0 00 00 01 18 45 43" type="" name="Digital Signature (SSCA)" description="Digital Signature Application" enabled="true"/>
+	<application aid="A0 00 00 01 18 45 4E" type="" name="Encryption Application" description="Encryption Application (Version 1.10)" enabled="true"/>
+	<application aid="A0 00 00 01 21 10 10" type="emv" name="Dankort (VISA GEM Vision)" description="Danish domestic debit card" enabled="true"/>
+	<application aid="A0 00 00 01 32 00 01" type="" name="org.javacardforum.javacard.biometry" description="" enabled="true"/>
+	<application aid="A0 00 00 01 40 80 01" type="" name="eCode" description="" enabled="true"/>
+	<application aid="A0 00 00 01 41 00 01" type="emv" name="PagoBANCOMAT" description="CoGeBan Consorzio BANCOMAT (Italian domestic debit card)" enabled="true"/>
+	<application aid="A0 00 00 01 51 00 00" type="GP" name="Global Platform Security Domain AID" description="GP Card Manager" enabled="true"/>
+	<application aid="A0 00 00 01 51 53 50 43 41 53 44 00" type="GP" name="CASD_AID" description="SPCASD" enabled="true"/>
+	<application aid="A0 00 00 01 52 30 10" type="emv" name="Discover, Pulse D Pas" description="Discover Card" enabled="true"/>
+	<application aid="A0 00 00 01 52 40 10" type="emv" name="Discover" description="Discover Debit Common Card" enabled="true"/>
+	<application aid="A0 00 00 01 54 44 42" type="emv" name="Banricompras Debito" description="Banrisul (Brazil)" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 10" type="" name="AMEX" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 20" type="" name="MasterCard" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 21" type="" name="Maestro" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 22" type="" name="Maestro" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 23" type="" name="CASH" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 30" type="" name="VISA" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 31" type="" name="VISA" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 40" type="" name="JCB" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 50" type="" name="Postcard" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 00 51" type="" name="Postcard" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 01 00" type="" name="MCard" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 01 04" type="" name="MyOne" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 01 09" type="" name="Mediamarkt Card" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 01 0A" type="" name="Gift Card" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 01 0B" type="" name="Bonuscard" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 01 0C" type="" name="WIRCard" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 01 0D" type="" name="Power Card" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 44 43" type="" name="DINERS CLUB" description="" enabled="true"/>
+	<application aid="A0 00 00 01 57 44 44" type="" name="Supercard Plus" description="" enabled="true"/>
+	<application aid="A0 00 00 01 67 41 30 00 FF" type="JCOP" name="JCOP Identify Applet" description="identify in JCOP-tools returns eg 27 34 01 2E 00 00 00 00 4E 58 37 35 31 41 00 03 28 62 B3 6A 82" enabled="true"/>
+	<application aid="A0 00 00 01 67 41 30 01" type="" name="FIPS 140-2" description="?" enabled="true"/>
+	<application aid="A0 00 00 01 72 95 00 01" type="emv" name="BAROC Financial Application Taiwan" description="The Bankers Association of the Republic of China" enabled="true"/>
+	<application aid="A0 00 00 01 77 50 4B 43 53 2D 31 35" type="" name="BelPIC (Belgian Personal Identity Card)" description="" enabled="true"/>
+	<application aid="A0 00 00 01 85 00 02" type="emv" name="UK Post Office Account card" description="" enabled="true"/>
+	<application aid="A0 00 00 01 88 44 43" type="" name="DINERS CLUB" description="" enabled="true"/>
+	<application aid="A0 00 00 02 04 00 00" type="" name="?" description="" enabled="true"/>
+	<application aid="A0 00 00 02 28 10 10" type="emv" name="SPAN (M/Chip)" description="SPAN2 (Saudi Payments Network) - Saudi Arabia domestic credit/debit card (Saudi Arabia Monetary Agency)" enabled="true"/>
+	<application aid="A0 00 00 02 28 20 10" type="emv" name="SPAN (VIS)" description="SPAN2 (Saudi Payments Network) - Saudi Arabia domestic credit/debit card (Saudi Arabia Monetary Agency)" enabled="true"/>
+	<application aid="A0 00 00 02 28 20 10 10 10" type="" name="SPAN" description="SPAN2 (Saudi Payments Network) - Saudi Arabia domestic credit/debit card (Saudi Arabia Monetary Agency)" enabled="true"/>
+	<application aid="A0 00 00 02 47 10 01" type="MRTD" name="Machine Readable Travel Documents (MRTD)" description="Electronic (Biometric) Passport. Issuer stored data application (The last three digits of the PIX shall be used to denote future version levels.)" enabled="true"/>
+	<application aid="A0 00 00 02 47 20 01" type="MRTD" name="Machine Readable Travel Documents (MRTD)" description="Electronic (Biometric) Passport. Application for hashes, digital signature, and certificate (The last three digits of the PIX shall be used to denote future version levels.)" enabled="true"/>
+	<application aid="A0 00 00 02 77 10 10" type="emv" name="INTERAC" description="Canadian domestic credit/debit card" enabled="true"/>
+	<application aid="A0 00 00 03 06 00 00 00 00 00 00 00" type="" name="PC/SC Initial access data AID" description="Possibly not an application..." enabled="true"/>
+	<application aid="A0 00 00 03 08 00 00 10 00 01 00" type="" name="Personal Identity Verification (PIV) / ID-ONE PIV BIO" description="PIV End Point Applet. Last 2 bytes designate version?" enabled="true"/>
+	<application aid="A0 00 00 03 15 10 10 05 28" type="emv" name="Currence PuC" description="" enabled="true"/>
+	<application aid="A0 00 00 03 15 60 20" type="emv" name="Chipknip" description="" enabled="true"/>
+	<application aid="A0 00 00 03 23 01" type="" name="MUSCLE Applet Package" description="http://osdir.com/ml/lib.muscle/2005-12/msg00066.html" enabled="true"/>
+	<application aid="A0 00 00 03 23 01 01" type="" name="MUSCLE Applet Instance" description="http://osdir.com/ml/lib.muscle/2005-12/msg00066.html" enabled="true"/>
+	<application aid="A0 00 00 03 24 10 10" type="" name="Discover Expresspay (ZIP)" description="" enabled="true"/>
+	<application aid="A0 00 00 03 33 01 01 01" type="" name="UnionPay Debit" description="" enabled="true"/>
+	<application aid="A0 00 00 03 33 01 01 02" type="" name="UnionPay Credit" description="" enabled="true"/>
+	<application aid="A0 00 00 03 33 01 01 03" type="" name="UnionPay Quasi Credit" description="" enabled="true"/>
+	<application aid="A0 00 00 03 33 01 01 06" type="" name="UnionPay Electronic Cash" description="" enabled="true"/>
+	<application aid="A0 00 00 03 33 01 01 08" type="" name="U.S. UnionPay Common Debit AID" description="" enabled="true"/>
+	<application aid="A0 00 00 03 37 30 10 00" type="" name="Retrait" description="" enabled="true"/>
+	<application aid="A0 00 00 03 37 10 10 00" type="" name="Standard" description="" enabled="true"/>
+	<application aid="A0 00 00 03 37 10 20 00" type="" name="Classic" description="" enabled="true"/>
+	<application aid="A0 00 00 03 37 10 10 01" type="" name="Prepaye Online" description="" enabled="true"/>
+	<application aid="A0 00 00 03 37 10 20 01" type="" name="Prepaye Possibile Offiline" description="" enabled="true"/>
+	<application aid="A0 00 00 03 37 60 10 01" type="" name="Porte Monnaie Electronique" description="" enabled="true"/>
+	<application aid="A0 00 00 03 59 10 10" type="" name="" description="Unknown" enabled="true"/>
+	<application aid="A0 00 00 03 59 10 10 02 80 01" type="emv" name="Girocard EAPS" description="ZKA (Germany)" enabled="true"/>
+	<application aid="A0 00 00 03 59 10 10 03 80" type="" name="" description="PagoBANCOMAT" enabled="true"/>
+	<application aid="A0 00 00 03 66 00 01" type="" name="Postamat" description="" enabled="true"/>
+	<application aid="A0 00 00 03 66 00 02" type="" name="Postamat VISA" description="" enabled="true"/>
+	<application aid="A0 00 00 03 71 00 01" type="emv" name="InterSwitch Verve Card" description="Nigerian local switch company" enabled="true"/>
+	<application aid="A0 00 00 03 84 10" type="" name="Savings (debit card)" description="" enabled="true"/>
+	<application aid="A0 00 00 03 84 20" type="" name="Cheque (debit card)" description="" enabled="true"/>
+	<application aid="A0 00 00 03 96 4D 66 34 4D 00 02" type="" name="MIFARE4MOBILE" description="NXP Mf4M" enabled="true"/>
+	<application aid="A0 00 00 03 97 42 54 46 59" type="" name="Microsoft IDMP AID" description="Identity Device With Microsoft Generic Profile application. 2 bytes can be added at the end. This byte must be set to the IDMP specification revision number which is currently 0x01. The second byte (yy) is reserved for use by the card application." enabled="true"/>
+	<application aid="A0 00 00 03 97 43 49 44 5F 01 00" type="" name="Microsoft PNP AID" description="MS Plug and Play" enabled="true"/>
+	<application aid="A0 00 00 04 27 10 10" type="" name="Hiperchip" description="" enabled="true"/>
+	<application aid="A0 00 00 04 32 00 01" type="" name="Universal Electronic Card" description="" enabled="true"/>
+	<application aid="A0 00 00 04 36 01 00" type="" name="Ticket Restaurant" description="" enabled="true"/>
+	<application aid="A0 00 00 04 39 10 10" type="" name="Exchange ATM card" description="The Exchange Network ATM Network" enabled="true"/>
+	<application aid="A0 00 00 04 54 00 10" type="emv" name="Etranzact Genesis Card" description="Nigerian local switch company" enabled="true"/>
+	<application aid="A0 00 00 04 54 00 11" type="emv" name="Etranzact Genesis Card 2" description="Nigerian local switch company" enabled="true"/>
+	<application aid="A0 00 00 04 76 20 10" type="" name="GOOGLE_CONTROLLER_AID" description="GOOGLE_LOCKET_AID" enabled="true"/>
+	<application aid="A0 00 00 04 76 30 30" type="" name="GOOGLE_MIFARE_MANAGER_AID" description="" enabled="true"/>
+	<application aid="A0 00 00 04 76 6C" type="emv" name="GOOGLE_PAYMENT_AID" description="" enabled="true"/>
+	<application aid="A0 00 00 04 76 A0 10" type="GP" name="GSD_MANAGER_AID" description="" enabled="true"/>
+	<application aid="A0 00 00 04 76 A1 10" type="GP" name="GSD_MANAGER_AID" description="" enabled="true"/>
+	<application aid="A0 00 00 04 85" type="" name="Softcard SmartTap" description="" enabled="true"/>
+	<application aid="A0 00 00 05 24 10 10" type="emv" name="RuPay" description="RuPay (India)" enabled="true"/>
+	<application aid="A0 00 00 05 27 10 02" type="YKNEO" name="Yubikey NEO U2F Demo applet" description="Universal 2-Factor Proof-of-concept/Demo" enabled="true"/>
+	<application aid="A0 00 00 05 27 20 01 01" type="YKNEO" name="Yubikey NEO Yubikey2 applet interface" description="Javacard Applet AID" enabled="true"/>
+	<application aid="A0 00 00 05 27 21 01 01" type="yk" name="Yubikey NEO OATH Applet" description="Javacard Applet AID" enabled="true"/>
+	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 01 00" type="" name="ISD-R Application. Used as TAR." description="" enabled="true"/>
+	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 02 00" type="" name="ECASD Application. Used as TAR." description="" enabled="true"/>
+	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 0D 00" type="" name="ISD-P Executable Load File." description="" enabled="true"/>
+	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 0E 00" type="" name="ISD-P Executable Module." description="" enabled="true"/>
+	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 0F 00" type="" name="Reserved value for the Profile's ISD-P" description="" enabled="true"/>
+	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 10 00" type="" name="ISD-P Application ('1010FFFFFFFF89000010' to '1010FFFFFFFF8900FFFF'. Used as TAR. The value is allocated during the 'Profile Download and Installation procedure'" description="" enabled="true"/>
+	<application aid="A0 00 00 06 17 00" type="" name="Fidesmo javacard" description="" enabled="true"/>
+	<application aid="A0 00 00 06 20 06 20" type="" name="Debit Network Alliance (DNA)" description="Common U.S. Debit" enabled="true"/>
+	<application aid="A0 00 00 06 58 10 10" type="" name="MIR Credit" description="" enabled="true"/>
+	<application aid="A0 00 00 06 58 10 11" type="" name="MIR Credit" description="" enabled="true"/>
+	<application aid="A0 00 00 06 58 20 10" type="" name="MIR Debit" description="" enabled="true"/>
+	<application aid="A0 00 00 06 72 30 10" type="emv" name="TROY chip credit card" description="Turkey's Payment Method" enabled="true"/>
+	<application aid="A0 00 00 06 72 30 20" type="emv" name="TROY chip debit card" description="Turkey's Payment Method" enabled="true"/>
+	<application aid="A0 00 00 07 70 58 50" type="emv" name="XTRAPOWER Fleet Card Program" description="Indian Oil’s Pre Paid Program" enabled="true"/>
+	<application aid="B0 12 34 56 78" type="emv" name="Maestro TEST" description="Used for development" enabled="true"/>
+	<application aid="D0 40 00 00 01 00 00 02" type="" name="Paylife Quick (IEP). Preloaded Electronic Purse" description="Domestic Payment System (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 02 00 00 02" type="" name="RFU" description="Domestic Payment System (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 03 00 00 02" type="" name="POS" description="Domestic Payment System (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 04 00 00 02" type="" name="ATM" description="Domestic Payment System (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 0B 00 00 02" type="" name="Retail" description="Domestic Loyalty Program (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 0C 00 00 02" type="" name="Bank_Data" description="Domestic Loyalty Program (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 0D 00 00 02" type="" name="Shopping" description="Domestic Loyalty Program (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 13 00 00 01" type="" name="DF_UNI_Kepler1" description="Domestic Loyalty Program (Version 2.0)" enabled="true"/>
+	<application aid="D0 40 00 00 13 00 00 01" type="" name="DF_Schüler1" description="Domestic Loyalty Program (Version 1.3)" enabled="true"/>
+	<application aid="D0 40 00 00 13 00 00 02" type="" name="DF_UNI_Kepler2" description="Domestic Loyalty Program (Version 2.0)" enabled="true"/>
+	<application aid="D0 40 00 00 13 00 00 02" type="" name="DF_Schüler2" description="Domestic Loyalty Program (Version 1.3)" enabled="true"/>
+	<application aid="D0 40 00 00 14 00 00 01" type="" name="DF_Mensa" description="Domestic Loyalty Program (Version 2.0)" enabled="true"/>
+	<application aid="D0 40 00 00 15 00 00 01" type="" name="DF_UNI_Ausweis" description="Domestic Loyalty Program (Version 2.0)" enabled="true"/>
+	<application aid="D0 40 00 00 15 00 00 01" type="" name="DF_Ausweis" description="Domestic Loyalty Program (Version 1.3)" enabled="true"/>
+	<application aid="D0 40 00 00 19 00 01" type="" name="EMV ATM Maestro" description="Domestic EMV Application (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 19 00 02" type="" name="EMV POS Maestro" description="Domestic EMV Application (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 19 00 03" type="" name="EMV ATM MasterCard" description="Domestic EMV Application (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 19 00 04" type="" name="EMV POS MasterCard" description="Domestic EMV Application (Version 2.1)" enabled="true"/>
+	<application aid="D0 40 00 00 19 00 10" type="" name="Digital ID" description="Domestic Payment System (Version 2.1)" enabled="true"/>
+	<application aid="D2 68 00 00 01" type="" name="Fiscal module application" description="Georgia Revenue Service application for fiscal cash registers" enabled="true"/>
+	<application aid="D2 76 00 00 05" type="" name="" description="Giesecke &amp; Devrient" enabled="true"/>
+	<application aid="D2 76 00 00 05 AA 04 03 60 01 04 10" type="" name="G D App Nokia 6212" description="" enabled="true"/>
+	<application aid="D2 76 00 00 05 AA 05 03 E0 04 01" type="" name="G D App Nokia 6212" description="" enabled="true"/>
+	<application aid="D2 76 00 00 05 AA 05 03 E0 05 01" type="" name="G D App Nokia 6212" description="" enabled="true"/>
+	<application aid="D2 76 00 00 05 AA 05 03 E0 05 01 01" type="" name="G D App Nokia 6212" description="" enabled="true"/>
+	<application aid="D2 76 00 00 05 AB 05 03 E0 04 01 01" type="" name="G D App Nokia 6212" description="" enabled="true"/>
+	<application aid="D2 76 00 00 22 00 00 00 01" type="" name="SCT LOYALTY" description="IBM Test card from the book 'Smart Card Application Development Using Java'" enabled="true"/>
+	<application aid="D2 76 00 00 22 00 00 00 02" type="" name="BUSINESS CARD" description="IBM Test card from the book 'Smart Card Application Development Using Java'" enabled="true"/>
+	<application aid="D2 76 00 00 22 00 00 00 60" type="" name="PKCS#11 Token" description="IBM Test card from the book 'Smart Card Application Development Using Java'" enabled="true"/>
+	<application aid="D2 76 00 00 25" type="" name="Girocard" description="Girocard (Geldkarte) in Germany" enabled="true"/>
+	<application aid="D2 76 00 00 25 45 41 01 00" type="" name="" description="Unknown" enabled="true"/>
+	<application aid="D2 76 00 00 25 45 50 01 00" type="emv" name="Girocard" description="ZKA Girocard (Geldkarte) (Germany)" enabled="true"/>
+	<application aid="D2 76 00 00 25 47 41 01 00" type="" name="Girocard ATM" description="" enabled="true"/>
+	<application aid="D2 76 00 00 60" type="" name="" description="" enabled="true"/>
+	<application aid="D2 76 00 00 85 01 00" type="" name="NDEF Tag Application / Mifare DESFire Tag Application" description="NFC Forum Type 4 Tag" enabled="true"/>
+	<application aid="D2 76 00 00 85 01 01" type="" name="NDEF Tag Application" description="NFC Tag type 4 tag" enabled="true"/>
+	<application aid="D2 76 00 01 18" type="" name="" description="" enabled="true"/>
+	<application aid="D2 76 00 01 18 01 01" type="" name="Giesecke &amp;" description="Devrient Test Applet?" enabled="true"/>
+	<application aid="D2 76 00 01 24 01" type="OpenPGP" name="OpenPGP Card" description="For selection when not knowing the exact full AID" enabled="true"/>
+	<application aid="D2 76 00 01 24 01 01 01 FF FF 00 00 00 01 00 00" type="OpenPGP" name="OpenPGP Card" description="Version 1" enabled="true"/>
+	<application aid="D2 76 00 01 24 01 02 00 00 00 00 00 00 01 00 00" type="OpenPGP" name="OpenPGP Card" description="Version 2" enabled="true"/>
+	<application aid="D2 76 00 01 24 02" type="SmartChess" name="SmartChess" description="http://smartchess.de/englisch/SmartChess_1.0.pdf" enabled="true"/>
+	<application aid="D2 76 00 01 24 02 00 01 00 00 00 00 00 00 00 00" type="SmartChess" name="SmartChess" description="http://smartchess.de/englisch/SmartChess_1.0.pdf" enabled="true"/>
+	<application aid="D4 10 00 00 01 10 10" type="" name="" description="" enabled="true"/>
+	<application aid="D5 28 00 50 21 80 02" type="emv" name="?" description="(Netherlands)" enabled="true"/>
+	<application aid="D5 78 00 00 02 10 10" type="emv" name="Bankaxept" description="Norwegian domestic debit card" enabled="true"/>
+	<application aid="D7 56 00 00 01 01 01" type="" name="Reka Card" description="prepaid functional debit card" enabled="true"/>
+	<application aid="D7 56 00 00 30 01 01" type="" name="M Budget" description="" enabled="true"/>
+	<application aid="E8 07 04 00 7F 00 07 03 02" type="" name="nPA" description="German eID" enabled="true"/>
+	<application aid="E8 28 81 C1 17 02" type="" name="AlphaCard application" description="" enabled="true"/>
+	<application aid="E8 28 BD 08 0F" type="" name="ISO-7816-15 EF.DIR" description="Iso adoption of PKCS-15" enabled="true"/>
+	<application aid="F0 00 00 00 03 00 01" type="emv" name="BRADESCO" description="Brazilian Bank Banco Bradesco" enabled="true"/>
 </applications>

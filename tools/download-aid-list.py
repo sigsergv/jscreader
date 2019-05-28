@@ -8,7 +8,7 @@ from sys import exit
 
 SOURCE = 'https://www.eftlab.com/index.php/site-map/knowledge-base/211-emv-aid-rid-pix'
 r = urllib.request.urlopen(SOURCE)
-html = r.read()
+html = r.read().decode('utf8')
 
 # html = codecs.open('/tmp/test.html', encoding='utf8').read()
 
@@ -21,7 +21,8 @@ for row in ROWS_RE.findall(html):
         # print('Invalid row: %s' % row)
         continue
     i += 1
-    aid, vendor, country, name, description, t = mo.groups()
+    items = [s.strip().replace('&amp;', '&') for s in mo.groups()]
+    aid, vendor, country, name, description, t = items
 
     # reformat AID
     if len(aid) % 2 != 0:
