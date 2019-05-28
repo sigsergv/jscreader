@@ -77,6 +77,8 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 System.out.printf("No isap, SW: %04X\n", answer.getSW());
             }
 
+            var discoveredApps = new ArrayList<String>(5);
+
             // try to select MF
             cmd = Util.toByteArray("00 A4 00 00 02 3F 00 00");
             answer = channel.transmit(new CommandAPDU(cmd));
@@ -111,7 +113,6 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             //     System.out.printf("No MF Data, SW=0x%04x\n", answer.getSW());
             // }
 
-            var discoveredApps = new ArrayList<byte[]>(5);
 
             // try yubikey app
             cmd = Util.toByteArray("00   A4   04 00  07 A0 00 00 05 27 21 01");
@@ -139,6 +140,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 var adfNode = new TreeItem<CardItemRootModel>(adfInfo);
                 // adfNode.setExpanded(true);
                 root.getChildren().add(adfNode);
+                discoveredApps.add("D2 76 00 01 24 01");
             } else {
                 // System.out.printf("SW: %04X", answer.getSW());
             }
@@ -210,6 +212,9 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             //                                                  CLA INS P1 P2
             var selectAppCommandTemplate = Util.toByteArray("00  A4  04 00");
             for (var x : CandidateApplications.getInstance().list()) {
+                if (discoveredApps.indexOf(Util.hexify(x.aid)) != -1) {
+                    continue;
+                }
                 byte[] cmdLcPart = {(byte)x.aid.length};
                 cmd = Util.concatArrays(cmdLcPart, x.aid);
                 cmd = Util.concatArrays(selectAppCommandTemplate, cmd);
