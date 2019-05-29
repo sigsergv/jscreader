@@ -77,12 +77,20 @@ public class Main extends Application {
 
     public static Stage createProgressWindow(String labelText) {
         var progressWindow = new Stage(javafx.stage.StageStyle.UNDECORATED);
+        // var progressWindow = new Stage(javafx.stage.StageStyle.DECORATED);
         progressWindow.initOwner(Main.getPrimaryStage());
         progressWindow.initModality(javafx.stage.Modality.APPLICATION_MODAL);
         var label = new Label(labelText);
         var scene = new Scene(label, 400, 100);
         progressWindow.setScene(scene);
-    
+        progressWindow.show();
         return progressWindow;        
+    }
+
+    public static void closeProgressWindow(Stage progressWindow) {
+        if (progressWindow == null) {
+            return;
+        }
+        progressWindow.close();
     }
 }

@@ -28,6 +28,8 @@ import javax.smartcardio.ResponseAPDU;
 class CardItemsTree extends TreeView<CardItemRootModel>
     implements CardInsertedListener, CardRemovedListener
 {
+    private Stage progressWindow = null;
+
     public CardItemsTree() {
         // subscribe to card inserted event
         var dm = DeviceManager.getInstance();
@@ -37,7 +39,8 @@ class CardItemsTree extends TreeView<CardItemRootModel>
     }
 
     public void cardInserted(ChangeEvent e) {
-        Platform.runLater(this::readSelectedTerminalCard);
+        // Platform.runLater(this::readSelectedTerminalCard);
+        readSelectedTerminalCard();
     }
 
     public void cardRemoved(ChangeEvent e) {
@@ -45,6 +48,96 @@ class CardItemsTree extends TreeView<CardItemRootModel>
     }
 
     protected void readSelectedTerminalCard() {
+        progressWindow = Main.createProgressWindow("Reading card");
+        progressWindow.show();
+
+        var workerThread = new Thread() {
+            public void run() {
+                var dm = DeviceManager.getInstance();
+                var terminalName = dm.getSelectedTerminalName();
+                var terminal = dm.getTerminal(terminalName);
+
+                if (terminal == null) {
+                    Platform.runLater(() -> {
+                        Main.closeProgressWindow(progressWindow);
+                        progressWindow = null;
+                    });
+                    return;
+                }
+                // set new tree nodes
+                var root = new TreeItem<CardItemRootModel>();
+                root.setExpanded(true);
+                Platform.runLater(() -> { setRoot(root); });
+
+                // "General information" node
+                try {
+                    var card = terminal.connect("*");
+                    var cardGeneralInfo = new CardItemGeneralInformationModel("General Information",
+                        card.getATR().getBytes());
+                    var generalInformationNode = new TreeItem<CardItemRootModel>(cardGeneralInfo);
+                    Platform.runLater(() -> { root.getChildren().add(generalInformationNode); });
+
+                    // other nodes
+                    var channel = card.getBasicChannel();
+                    byte[] cmd; 
+                    ResponseAPDU answer;
+
+                    var discoveredApps = new ArrayList<String>(5);
+
+
+                    // discover MF
+                    discoveredApps.addAll(processMF(channel, root));
+
+                    // try yubikey app
+                    discoveredApps.addAll(processYubikey(channel, root));
+
+                    // try OpenPGP application
+                    discoveredApps.addAll(processOpenpgp(channel, root));
+
+                    // try EMV PSE
+                    discoveredApps.addAll(processPSE1(channel, root));
+
+                    // walk through list of known applications
+                    var selectAppCommandTemplate = Util.toByteArray("00 A4 04 00");
+                    for (var x : CandidateApplications.getInstance().list()) {
+                        if (!x.getEnabled()) {
+                            continue;
+                        }
+                        var aid = x.getAid();
+                        if (discoveredApps.indexOf(Util.hexify(aid)) != -1) {
+                            continue;
+                        }
+                        byte[] cmdLcPart = {(byte)aid.length};
+                        cmd = Util.concatArrays(cmdLcPart, aid);
+                        cmd = Util.concatArrays(selectAppCommandTemplate, cmd);
+                        answer = channel.transmit(new CommandAPDU(cmd));
+                        if (answer.getSW() == 0x9000) {
+                            // insert found ADF info
+                            var adfInfo = new CardItemAdfFCIModel(String.format("ADF (AID=%s)", Util.hexify(aid)), 
+                                answer.getData(), aid, x.getType(), x.getName());
+                            var adfNode = new TreeItem<CardItemRootModel>(adfInfo);
+                            Platform.runLater(() -> { root.getChildren().add(adfNode); });
+                        }
+                    }
+
+                    // Select "General Information" node
+                    Platform.runLater(() -> { getSelectionModel().selectFirst(); });
+                } catch (CardException e) {
+                    System.err.printf("Card read failed: %s%n", e);
+                    e.printStackTrace();
+                }
+
+                Platform.runLater(() -> {
+                    Main.closeProgressWindow(progressWindow);
+                    progressWindow = null;
+                });
+            }
+        };
+        workerThread.start();
+
+    }
+
+    protected void XXXreadSelectedTerminalCard() {
         var progressWindow = Main.createProgressWindow("Reading card");
         progressWindow.show();
 
@@ -136,7 +229,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
 
             // TODO: add EF.DIR, EF.ATR and other files
         } else {
-            System.out.printf("No MF, SW: %04X\n", answer.getSW());
+            // System.out.printf("No MF, SW: %04X\n", answer.getSW());
         }
         return discoveredApps;
     }
@@ -148,7 +241,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
         var cmd = Util.toByteArray("00 A4 04 00 07 A0 00 00 05 27 21 01");
         var answer = channel.transmit(new CommandAPDU(cmd));
         if (answer.getSW() == 0x9000) {
-            System.out.printf("DATA: %s\n", Util.hexify(answer.getData()));
+            // System.out.printf("DATA: %s\n", Util.hexify(answer.getData()));
             discoveredApps.add("A0 00 00 05 27 21 01");
         }
         return discoveredApps;
