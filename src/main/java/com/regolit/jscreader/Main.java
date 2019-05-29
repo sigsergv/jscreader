@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.SplitPane;
 import javafx.application.Platform;
 
 
@@ -37,16 +37,15 @@ public class Main extends Application {
         var cardTree = new CardItemsTree();
         var outputArea = new CardInfoTextView(cardTree);
 
-        var hbox = new HBox(4);
-        hbox.getChildren().addAll(cardTree, outputArea);
-        HBox.setHgrow(outputArea, javafx.scene.layout.Priority.ALWAYS);
-        // textarea.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        var sp = new SplitPane();
+        sp.getItems().addAll(cardTree, outputArea);
+        sp.setDividerPositions(0.3f, 0.6f);
 
-        VBox.setVgrow(hbox, javafx.scene.layout.Priority.ALWAYS);
+        VBox.setVgrow(sp, javafx.scene.layout.Priority.ALWAYS);
 
         var vbox = new VBox(4);  // spacing between items inside vbox layout
         vbox.setPadding(new javafx.geometry.Insets(4));  // set padding around vbox
-        vbox.getChildren().addAll(deviceSelector, hbox);
+        vbox.getChildren().addAll(deviceSelector, sp);
 
         var scene = new Scene(vbox, 900, 500);
         stage.setScene(scene);
