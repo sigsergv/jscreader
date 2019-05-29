@@ -127,16 +127,18 @@ class CardInfoTextView extends VBox {
 
         try {
             var root = BerTlv.parseBytes(fciData);
-            sb.append("Decoded BER-TLV data:\n");
+            sb.append("<p>").append("Decoded BER-TLV data:\n").append("</p>");
+            sb.append("<pre>");
             sb.append(root.toString());
-            sb.append("\n");
+            sb.append("</pre>");
         // } catch (BerTlv.ConstraintException e) {
         //     sb.append(String.format("Failed to parse FCI data: %s\n", e));
         } catch (BerTlv.ParsingException e) {
             // sb.append(String.format("Failed to parse FCI data: %s\n", e));
-            sb.append("Failed to decode data as FCI object.\n\n");
+            sb.append("<p>").append("Failed to decode data as FCI object.").append("</p>");
+            sb.append("<p>").append("Raw data:").append("</p>");
 
-            sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
+            sb.append("<pre>").append(Util.hexify(fciData, 16)).append("</pre>");
         }
         setText(sb.toString());
     }
@@ -148,8 +150,9 @@ class CardInfoTextView extends VBox {
             // see https://developers.yubico.com/OATH/YKOATH_Protocol.html
             var sb = new StringBuilder(getText());
             var fciData = value.getFciData();
-            sb.append("Yubikey application.\n");
-            sb.append("Challenge data:\n");
+            sb.append("<p>").append("Yubikey application").append("</p>");
+            sb.append("<p>").append("Challenge data:").append("</p>");
+            sb.append("<pre>");
             if (fciData[0] == 0x79) {
                 try {
                     for (SimpleTlv part: SimpleTlv.parseBytes(fciData)) {
@@ -179,6 +182,7 @@ class CardInfoTextView extends VBox {
                 sb.append("Failed to parse YKOATH SELECT instruction result.\n");
                 sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
             }
+            sb.append("</pre>");
             setText(sb.toString());
         } else {
             processValue((CardItemFCIModel)value);
