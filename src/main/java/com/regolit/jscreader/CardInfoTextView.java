@@ -116,9 +116,10 @@ class CardInfoTextView extends TextArea {
         processValue((CardItemRootModel)value);
 
         var sb = new StringBuilder(getText());
+        var fciData = value.getFciData();
 
         try {
-            var root = BerTlv.parseBytes(value.fciData);
+            var root = BerTlv.parseBytes(fciData);
             sb.append("Decoded BER-TLV data:\n");
             sb.append(root.toString());
             sb.append("\n");
@@ -128,7 +129,7 @@ class CardInfoTextView extends TextArea {
             // sb.append(String.format("Failed to parse FCI data: %s\n", e));
             sb.append("Failed to decode data as FCI object.\n\n");
 
-            sb.append(String.format("Raw data: %s\n", Util.hexify(value.fciData)));
+            sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
         }
         setText(sb.toString());
     }
@@ -139,11 +140,12 @@ class CardInfoTextView extends TextArea {
             // special processing of Yubikey
             // see https://developers.yubico.com/OATH/YKOATH_Protocol.html
             var sb = new StringBuilder(getText());
+            var fciData = value.getFciData();
             sb.append("Yubikey application.\n");
             sb.append("Challenge data:\n");
-            if (value.fciData[0] == 0x79) {
+            if (fciData[0] == 0x79) {
                 try {
-                    for (SimpleTlv part: SimpleTlv.parseBytes(value.fciData)) {
+                    for (SimpleTlv part: SimpleTlv.parseBytes(fciData)) {
                         switch (part.getTag()) {
                         case 0x79:
                             sb.append(String.format("  Version: %s\n", Util.hexify(part.getValue())));
@@ -164,11 +166,11 @@ class CardInfoTextView extends TextArea {
                     }
                 } catch (SimpleTlv.ParsingException e) {
                     sb.append("SIMPLE-TLV parse failed.\n");
-                    sb.append(String.format("Raw data: %s\n", Util.hexify(value.fciData)));
+                    sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
                 }
             } else {
                 sb.append("Failed to parse YKOATH SELECT instruction result.\n");
-                sb.append(String.format("Raw data: %s\n", Util.hexify(value.fciData)));
+                sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
             }
             setText(sb.toString());
         } else {
@@ -185,7 +187,7 @@ class CardInfoTextView extends TextArea {
 
         var sb = new StringBuilder(getText());
         sb.append("OpenPGP data objects:\n\n");
-        var iter = value.dataObjects.entrySet().iterator();
+        var iter = value.getDataObjects().entrySet().iterator();
 
         while (iter.hasNext()) {
             Map.Entry pair = (Map.Entry)iter.next();

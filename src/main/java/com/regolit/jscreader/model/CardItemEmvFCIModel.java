@@ -4,15 +4,20 @@ package com.regolit.jscreader.model;
 
 
 public class CardItemEmvFCIModel extends CardItemFCIModel {
-    public byte[] aid;
-    public String name;
-    public ApplicationInfoModel.TYPE type;
-    private byte[] aipData;
-    private byte[] aflData;
+    private final byte[] aipData;
+    private final byte[] aflData;
 
     public CardItemEmvFCIModel(String title, byte[] fciData, byte[] aipData, byte[] aflData) {
         super(title, fciData);
         this.aipData = aipData;
         this.aflData = aflData;
+    }
+
+    public byte[] getAipData() {
+        return aipData;
+    }
+
+    public byte[] getAflData() {
+        return aflData;
     }
 }
