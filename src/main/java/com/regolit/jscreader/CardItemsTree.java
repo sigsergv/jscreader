@@ -15,6 +15,7 @@ import com.regolit.jscreader.model.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javafx.stage.Stage;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
 import javafx.application.Platform;
@@ -44,6 +45,9 @@ class CardItemsTree extends TreeView<CardItemRootModel>
     }
 
     protected void readSelectedTerminalCard() {
+        var progressWindow = Main.createProgressWindow("Reading card");
+        progressWindow.show();
+
         var dm = DeviceManager.getInstance();
         var terminalName = dm.getSelectedTerminalName();
         var terminal = dm.getTerminal(terminalName);
@@ -113,6 +117,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
         } catch (CardException e) {
             System.err.printf("Card read failed: %s%n", e);
         }
+        progressWindow.close();
     }
 
     private List<String> processMF(CardChannel channel, TreeItem<CardItemRootModel> parent)

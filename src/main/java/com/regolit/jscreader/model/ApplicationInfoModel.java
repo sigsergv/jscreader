@@ -42,7 +42,7 @@ public class ApplicationInfoModel {
     }
 
     public boolean getEnabled() {
-        return false;
-        // return enabled;
+        // return false;
+        return enabled;
     }
 }
