@@ -116,6 +116,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             getSelectionModel().selectFirst();
         } catch (CardException e) {
             System.err.printf("Card read failed: %s%n", e);
+            e.printStackTrace();
         }
         progressWindow.close();
     }
