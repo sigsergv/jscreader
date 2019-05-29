@@ -47,6 +47,7 @@ public class Main extends Application {
 
         var scene = new Scene(vbox, 900, 500);
         stage.setScene(scene);
+        stage.setTitle("JSmartCardReader");
         stage.show();
     }
 

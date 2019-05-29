@@ -12,16 +12,23 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TextArea;
+// import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 import javafx.beans.value.ObservableValue;
 import java.lang.StringBuilder;
 
-class CardInfoTextView extends TextArea {
+class CardInfoTextView extends VBox {
     private CardItemsTree cardInfoTree;
+    private WebView view;
+    private String html;  // one way display: html -> webview
 
     public CardInfoTextView(CardItemsTree cardInfoTree) {
+        view = new WebView();
+        getChildren().add(view);
+
         this.cardInfoTree = cardInfoTree;
-        setEditable(false);
+        // setEditable(false);
 
         // subscribe
         this.cardInfoTree.getSelectionModel().selectedItemProperty().addListener(new javafx.beans.value.ChangeListener<TreeItem>() {
@@ -59,9 +66,9 @@ class CardInfoTextView extends TextArea {
         processValue((CardItemRootModel)value);
 
         var sb = new StringBuilder(getText());
-        sb.append(String.format("ATR: %s%n", Util.hexify(value.getAtr())));
+        sb.append(String.format("<p>ATR: %s</p>", Util.hexify(value.getAtr())));
         var atr = new ATR(value.getAtr());
-        sb.append(atr.parseToText());
+        sb.append("<pre>").append(atr.parseToText()).append("</pre>");
         sb.append("\n");
         setText(sb.toString());
     }
@@ -186,9 +193,10 @@ class CardInfoTextView extends TextArea {
         processValue((CardItemRootModel)value);
 
         var sb = new StringBuilder(getText());
-        sb.append("OpenPGP data objects:\n\n");
+        sb.append("<p>").append("OpenPGP data objects:").append("</p>");
         var iter = value.getDataObjects().entrySet().iterator();
 
+        sb.append("<pre>");
         while (iter.hasNext()) {
             Map.Entry pair = (Map.Entry)iter.next();
 
@@ -222,6 +230,7 @@ class CardInfoTextView extends TextArea {
                 break;
             }
         }
+        sb.append("</pre>");
         setText(sb.toString());
     }
 
@@ -230,8 +239,18 @@ class CardInfoTextView extends TextArea {
     }
 
     private void processValue(CardItemRootModel value) {
-        var text = "";
-        text += value.getTitle() + "\n\n";
-        setText(text);
+        var sb = new StringBuilder();
+        sb.append("<h3>").append(value.getTitle()).append("</h3>");
+        // text += value.getTitle() + "\n\n";
+        setText(sb.toString());
+    }
+
+    private String getText() {
+        return html;
+    }
+
+    private void setText(String text) {
+        html = text;
+        view.getEngine().loadContent(html);
     }
 }
