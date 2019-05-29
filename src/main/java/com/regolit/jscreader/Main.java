@@ -39,7 +39,7 @@ public class Main extends Application {
 
         var sp = new SplitPane();
         sp.getItems().addAll(cardTree, outputArea);
-        sp.setDividerPositions(0.3f, 0.6f);
+        sp.setDividerPositions(0.3f, 0.3f);
 
         VBox.setVgrow(sp, javafx.scene.layout.Priority.ALWAYS);
 
