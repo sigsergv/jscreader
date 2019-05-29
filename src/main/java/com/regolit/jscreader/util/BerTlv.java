@@ -259,7 +259,7 @@ public class BerTlv {
         String s;
 
         if (encoding == Encoding.PRIMITIVE) {
-            s = String.format("TAG:   %s(PRIMITIVE)%nVALUE: %s", 
+            s = String.format("TAG: %s (PRIMITIVE)%nVALUE: %s", 
                 Util.hexify(tag), 
                 Util.hexify(value));
         } else {
@@ -270,7 +270,7 @@ public class BerTlv {
             }
             String partStringsJoined = String.join("\n", partStrings);
 
-            s = String.format("TAG:   %s(CONSTRUCTED)%n%s", 
+            s = String.format("TAG: %s (CONSTRUCTED)%n%s", 
                 Util.hexify(tag), 
                 partStringsJoined);
         }

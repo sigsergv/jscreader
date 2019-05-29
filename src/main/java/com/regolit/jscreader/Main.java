@@ -38,8 +38,18 @@ public class Main extends Application {
         var outputArea = new CardInfoTextView(cardTree);
 
         var sp = new SplitPane();
+        // we need to set divider position after everything is drawn
+        var changeListener = new javafx.beans.value.ChangeListener<Number>() {
+            @Override
+            public void changed(javafx.beans.value.ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                sp.setDividerPosition(0, 0.3);
+            }
+        };
+        sp.widthProperty().addListener(changeListener);
+        sp.heightProperty().addListener(changeListener);
+
         sp.getItems().addAll(cardTree, outputArea);
-        sp.setDividerPositions(0.3f, 0.3f);
+        // sp.setDividerPositions(0.6f, 0.9f, 0.1f);
 
         VBox.setVgrow(sp, javafx.scene.layout.Priority.ALWAYS);
 

@@ -206,31 +206,31 @@ class CardInfoTextView extends VBox {
 
             switch ((String)pair.getKey()) {
             case "4F":
-                sb.append(String.format("Full AID: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("Full AID (4F): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "5F 52":
-                sb.append(String.format("Historical bytes: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("Historical bytes (5F 52): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "C4":
-                sb.append(String.format("PW status bytes: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("PW status bytes (C4): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "6E":
-                sb.append(String.format("Application Related Data:\n %s\n", Util.hexify((byte[])pair.getValue(), 16)));
+                sb.append(String.format("Application Related Data (6E):\n %s\n", Util.hexify((byte[])pair.getValue(), 16)));
                 break;
             case "7F 74":
-                sb.append(String.format("General feature management: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("General feature management (7F 74): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "5E":
-                sb.append(String.format("Login data: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("Login data (5E): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "65":
-                sb.append(String.format("Cardholder Related Data: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("Cardholder Related Data (65): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "5F 50":
-                sb.append(String.format("URL: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("URL (5F 50): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             case "7A":
-                sb.append(String.format("Security support template: %s\n", Util.hexify((byte[])pair.getValue())));
+                sb.append(String.format("Security support template (7A): %s\n", Util.hexify((byte[])pair.getValue())));
                 break;
             }
         }
