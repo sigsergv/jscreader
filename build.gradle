@@ -1,12 +1,16 @@
 plugins {
-  id 'distribution'
-  id 'application'
-  id 'org.openjfx.javafxplugin' version '0.0.7'
-  id 'org.beryx.jlink' version '2.10.4'
+    id 'distribution'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.7'
+    id 'org.beryx.jlink' version '2.10.4'
 }
 
 repositories {
     mavenCentral()
+}
+
+jlink {
+    options = ['--verbose', '--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
 }
 
 javafx {
