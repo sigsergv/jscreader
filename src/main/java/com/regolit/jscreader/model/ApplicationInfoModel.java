@@ -8,6 +8,7 @@ public class ApplicationInfoModel {
     public enum TYPE {
         EMV,
         YK,
+        GP, // GlobalPlatform
         UNKNOWN
     };
 
@@ -22,6 +23,8 @@ public class ApplicationInfoModel {
         this.name = name;
         if (type.equals("emv")) {
             this.type = TYPE.EMV;
+        } else if (type.equals("GP")) {
+            this.type = TYPE.GP;
         } else if (type.equals("yk")) {
             this.type = TYPE.YK;
         } else {

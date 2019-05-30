@@ -122,9 +122,7 @@ public class BerTlv {
      * @return                     [description]
      * @throws ConstraintException [description]
      */
-    public BerTlv getPart(String tagBytesRepr)
-        throws ConstraintException
-    {
+    public BerTlv getPart(String tagBytesRepr) {
         return getPart(Util.toByteArray(tagBytesRepr));
     }
 
@@ -134,11 +132,10 @@ public class BerTlv {
      * @return                     [description]
      * @throws ConstraintException [description]
      */
-    public BerTlv getPart(byte[] tag)
-        throws ConstraintException
-    {
+    public BerTlv getPart(byte[] tag) {
         if (this.encoding != Encoding.CONSTRUCTED) {
-            throw new ConstraintException("Only CONSTRUCTED objects have parts.");
+            System.err.printf("Trying to return part of PRIMITIVE BER-TLV object.");
+            return null;
         }
         BerTlv part = null;
         for (BerTlv p : parts) {
@@ -275,6 +272,14 @@ public class BerTlv {
                 partStringsJoined);
         }
         return s;
+    }
+
+    public boolean isPrimitive() {
+        return encoding == Encoding.PRIMITIVE;
+    }
+
+    public boolean isConstructed() {
+        return encoding == Encoding.CONSTRUCTED;
     }
 
     /**

@@ -54,6 +54,8 @@ class CardInfoTextView extends VBox {
                     processValue((CardItemYkOathFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemPSE1FCIModel) {
                     processValue((CardItemPSE1FCIModel)nodeValue);
+                } else if (nodeValue instanceof CardItemGPFCIModel) {
+                    processValue((CardItemGPFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemFCIModel) {
                     processValue((CardItemFCIModel)nodeValue);
                 }
@@ -120,6 +122,156 @@ class CardInfoTextView extends VBox {
         setText(sb.toString());
     }
 
+    /**
+     * Global Platform applet, see GPC_Specification_v2.3.pdf
+     * @param value [description]
+     */
+    private void processValue(CardItemGPFCIModel value) {
+        processValue((CardItemRootModel)value);
+
+        var sb = new StringBuilder(getText());
+        sb.append("<h4>").append("GlobalPlatform app").append("</h4>");
+        var fciData = value.getFciData();
+
+        try {
+            var root = BerTlv.parseBytes(fciData);
+            if (root.tagEquals("6F")) {
+                // this is valid FCI/GP template
+                var part = root.getPart("84");
+                if (part != null) {
+                    sb.append("<p>")
+                        .append("<b>Application / file AID</b>: ")
+                        .append(Util.hexify(part.getValue()))
+                        .append("</p>");
+                }
+
+                var piTlv = root.getPart("A5");
+                if (piTlv != null) {
+                    part = piTlv.getPart("9F 6E");
+                    if (part != null) {
+                        sb.append("<p>")
+                            .append("<b>Application production Life Cycle data</b>: ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+
+                    part = piTlv.getPart("9F 65");
+                    if (part != null) {
+                        sb.append("<p>")
+                            .append("<b>Maximum length of data field in command message</b>: ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+
+                    part = piTlv.getPart("73");
+                    if (part != null) {
+                        var oidPart = part.getPart("06");
+                        if (oidPart != null) {
+                            sb.append("<p>")
+                                .append("<b>OID for Card Recognition Data</b>: ")
+                                .append(Util.gpOidToString(oidPart.getValue()))
+                                .append("</p>");
+                        }
+
+                        var subPart = part.getPart("60");
+                        if (subPart != null) {
+                            oidPart = subPart.getPart("06");
+                            if (oidPart != null) {
+                                sb.append("<p>")
+                                    .append("<b>OID for Card Management Type and Version</b>: ")
+                                    .append(Util.gpOidToString(oidPart.getValue()))
+                                    .append("</p>");
+                            }
+                        }
+                        subPart = part.getPart("63");
+                        if (subPart != null) {
+                            oidPart = subPart.getPart("06");
+                            if (oidPart != null) {
+                                sb.append("<p>")
+                                    .append("<b>OID for Card Identification Scheme</b>: ")
+                                    .append(Util.gpOidToString(oidPart.getValue()))
+                                    .append("</p>");
+                            }
+                        }
+                        subPart = part.getPart("64");
+                        if (subPart != null) {
+                            oidPart = subPart.getPart("06");
+                            if (oidPart != null) {
+                                sb.append("<p>")
+                                    .append("<b>OID for Secure Channel Protocol of the Security Domain and its implementation options</b>: ")
+                                    .append(Util.gpOidToString(oidPart.getValue()))
+                                    .append("</p>");
+                            }
+                        }
+                        subPart = part.getPart("65");
+                        if (subPart != null) {
+                            oidPart = subPart.getPart("06");
+                            if (oidPart != null) {
+                                sb.append("<p>")
+                                    .append("<b>Card configuration details</b>: ")
+                                    .append(Util.gpOidToString(oidPart.getValue()))
+                                    .append("</p>");
+                            }
+                        }
+                        subPart = part.getPart("66");
+                        if (subPart != null) {
+                            oidPart = subPart.getPart("06");
+                            if (oidPart != null) {
+                                sb.append("<p>")
+                                    .append("<b>Card / chip details</b>: ")
+                                    .append(Util.gpOidToString(oidPart.getValue()))
+                                    .append("</p>");
+                            }
+                        }
+                        subPart = part.getPart("67");
+                        if (subPart != null) {
+                            oidPart = subPart.getPart("06");
+                            if (oidPart != null) {
+                                sb.append("<p>")
+                                    .append("<b>Security Domain’s Trust Point certificate information</b>: ")
+                                    .append(Util.gpOidToString(oidPart.getValue()))
+                                    .append("</p>");
+                            }
+                        }
+                        subPart = part.getPart("68");
+                        if (subPart != null) {
+                            oidPart = subPart.getPart("06");
+                            if (oidPart != null) {
+                                sb.append("<p>")
+                                    .append("<b>Security Domain certificate information</b>: ")
+                                    .append(Util.gpOidToString(oidPart.getValue()))
+                                    .append("</p>");
+                            }
+                        }
+                    //     sb.append("<p>")
+                    //         .append("<b>Security Domain Management Data</b>: ")
+                    //         .append(Util.hexify(part.getValue()))
+                    //         .append("</p>");
+                    }
+                }
+
+                // // TODO: parse it
+                // sb.append("<p>").append("Valid FCI template:\n").append("</p>");
+                sb.append("<pre>");
+                sb.append(root.toString());
+                sb.append("</pre>");
+            } else {
+                sb.append("<p>").append("Unknown BER-TLV data:\n").append("</p>");
+                sb.append("<pre>");
+                sb.append(root.toString());
+                sb.append("</pre>");
+            }
+        // } catch (BerTlv.ConstraintException e) {
+        //     sb.append(String.format("Failed to parse FCI data: %s\n", e));
+        } catch (BerTlv.ParsingException e) {
+            // sb.append(String.format("Failed to parse FCI data: %s\n", e));
+            sb.append("<p>").append("Failed to decode data as FCI/GP object.").append("</p>");
+            sb.append("<p>").append("Raw data:").append("</p>");
+
+            sb.append("<pre>").append(Util.hexify(fciData, 16)).append("</pre>");
+        }        setText(sb.toString());
+    }
+
     private void processValue(CardItemFCIModel value) {
         processValue((CardItemRootModel)value);
 
@@ -128,10 +280,19 @@ class CardInfoTextView extends VBox {
 
         try {
             var root = BerTlv.parseBytes(fciData);
-            sb.append("<p>").append("Decoded BER-TLV data:\n").append("</p>");
-            sb.append("<pre>");
-            sb.append(root.toString());
-            sb.append("</pre>");
+            if (root.tagEquals("6F")) {
+                // this is valid FCI template
+                // TODO: parse it
+                sb.append("<p>").append("Valid FCI template:\n").append("</p>");
+                sb.append("<pre>");
+                sb.append(root.toString());
+                sb.append("</pre>");
+            } else {
+                sb.append("<p>").append("Unknown BER-TLV data:\n").append("</p>");
+                sb.append("<pre>");
+                sb.append(root.toString());
+                sb.append("</pre>");
+            }
         // } catch (BerTlv.ConstraintException e) {
         //     sb.append(String.format("Failed to parse FCI data: %s\n", e));
         } catch (BerTlv.ParsingException e) {

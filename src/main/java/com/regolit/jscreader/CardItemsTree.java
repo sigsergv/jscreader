@@ -112,11 +112,19 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                         cmd = Util.concatArrays(selectAppCommandTemplate, cmd);
                         answer = channel.transmit(new CommandAPDU(cmd));
                         if (answer.getSW() == 0x9000) {
-                            // insert found ADF info
-                            var adfInfo = new CardItemAdfFCIModel(String.format("ADF (AID=%s)", Util.hexify(aid)), 
-                                answer.getData(), aid, x.getType(), x.getName());
-                            var adfNode = new TreeItem<CardItemRootModel>(adfInfo);
-                            Platform.runLater(() -> { root.getChildren().add(adfNode); });
+                            if (x.getType() == ApplicationInfoModel.TYPE.GP) {
+                                // insert found GP info
+                                var info = new CardItemGPFCIModel(String.format("GP (AID=%s)", Util.hexify(aid)), 
+                                    answer.getData(), aid, x.getName());
+                                var node = new TreeItem<CardItemRootModel>(info);
+                                Platform.runLater(() -> { root.getChildren().add(node); });
+                            } else {
+                                // insert found ADF info
+                                var info = new CardItemAdfFCIModel(String.format("ADF (AID=%s)", Util.hexify(aid)), 
+                                    answer.getData(), aid, x.getType(), x.getName());
+                                var node = new TreeItem<CardItemRootModel>(info);
+                                Platform.runLater(() -> { root.getChildren().add(node); });
+                            }
                         }
                     }
 
@@ -362,8 +370,8 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 // do nothing
             } catch (BerTlv.ParsingException e) {
                 Util.errorLog("Failed to parse data while processing PSE1");
-            } catch (BerTlv.ConstraintException e) {
-                Util.errorLog("Failed to parse (constraint) data while processing PSE1");
+            // } catch (BerTlv.ConstraintException e) {
+            //     Util.errorLog("Failed to parse (constraint) data while processing PSE1");
             }
         }
         return discoveredApps;

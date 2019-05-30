@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.lang.StringBuilder;
 import java.util.Map;
 import java.util.HashMap;
-
+import java.math.BigInteger;
+import java.io.ByteArrayInputStream;
 
 public class Util {
     public static class BreakException extends Exception {}
@@ -280,5 +281,38 @@ public class Util {
         }
 
         return res;
+    }
+
+    public static String gpOidToString(byte[] data) {
+        // defined in ISO 8825-1/X.680
+        // explained in https://docs.microsoft.com/en-us/windows/desktop/SecCertEnroll/about-object-identifier
+        // ex:
+        //    2A 86 48 86 FC 6B 01
+        //    2A 86 48 86 FC 6B 02 02 01 01
+        //    2A 86 48 86 FC 6B 03
+        //    2A 86 48 86 FC 6B 04 02 15
+        //    2B 85 10 86 48 64 02 01 03
+        //    2B 06 01 04 01 2A 02 6E 01 02
+        var sb = new StringBuilder();
+        var is = new ByteArrayInputStream(data);
+        int x = is.read();
+
+        // first byte encodes 1st and 2nd OID nodes: n1*40 + n2 = b0
+        sb.append(x  / 40);
+        sb.append(".").append(x  % 40);
+        while (is.available() > 0) {
+            x = is.read();
+            if (x < 127) {
+                sb.append('.').append(x);
+            } else {
+                var v = BigInteger.valueOf(x & 0x7f);
+                do {
+                    x = is.read();
+                    v = v.shiftLeft(7).add(BigInteger.valueOf(x & 0x7f));
+                } while (x > 127);
+                sb.append('.').append(v);
+            }
+        }
+        return sb.toString();
     }
 }

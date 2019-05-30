@@ -17,9 +17,11 @@
 	<application aid="44 46 4D 46 41 2E 44 46 61 72 65 32 34 31 30 31" type="" name="DeviceFidelity In2Pay DFare applet" description="http://www.nfcworld.com/2010/11/24/35207/devicefidelity-adds-nfc-support-for-android-and-mifare/" enabled="true"/>
 	<application aid="A0 00 00 00 01 01" type="" name="MUSCLE Card Applet" description="(Unlicensed use of this RID. Proposal to use A000000323 instead)" enabled="true"/>
 	<application aid="A0 00 00 00 03 00 00 00" type="GP" name="(VISA) Card Manager" description="Used by most GP2.1.1 cards / Oberthur OP201 cards. Visa Proprietary Card Manager AID for OpenPlatform cards (visa.openplatform)." enabled="true"/>
+	<application aid="A0 00 00 00 03 10 10" type="emv" name="VISA Debit/Credit (Classic)" description="Standard/Gold VISA credit card" enabled="true"/>
+	
+	<!--
 	<application aid="A0 00 00 00 03 00 03 75 61" type="" name="Bonuscard" description="" enabled="true"/>
 	<application aid="A0 00 00 00 03 05 07 60 10" type="emv" name="VISA ELO Credit" description="" enabled="true"/>
-	<application aid="A0 00 00 00 03 10 10" type="emv" name="VISA Debit/Credit (Classic)" description="Standard/Gold VISA credit card" enabled="true"/>
 	<application aid="A0 00 00 00 03 10 10 01" type="emv" name="VISA Credit" description="" enabled="true"/>
 	<application aid="A0 00 00 00 03 10 10 02" type="emv" name="VISA Debit" description="" enabled="true"/>
 	<application aid="A0 00 00 00 03 20 10" type="emv" name="VISA Electron" description="VISA Electron (Debit)" enabled="true"/>
@@ -277,4 +279,5 @@
 	<application aid="E8 28 81 C1 17 02" type="" name="AlphaCard application" description="" enabled="true"/>
 	<application aid="E8 28 BD 08 0F" type="" name="ISO-7816-15 EF.DIR" description="Iso adoption of PKCS-15" enabled="true"/>
 	<application aid="F0 00 00 00 03 00 01" type="emv" name="BRADESCO" description="Brazilian Bank Banco Bradesco" enabled="true"/>
+	-->
 </applications>
