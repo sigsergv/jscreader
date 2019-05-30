@@ -209,7 +209,7 @@
 	<application aid="A0 00 00 05 24 10 10" type="emv" name="RuPay" description="RuPay (India)" enabled="true"/>
 	<application aid="A0 00 00 05 27 10 02" type="YKNEO" name="Yubikey NEO U2F Demo applet" description="Universal 2-Factor Proof-of-concept/Demo" enabled="true"/>
 	<application aid="A0 00 00 05 27 20 01 01" type="YKNEO" name="Yubikey NEO Yubikey2 applet interface" description="Javacard Applet AID" enabled="true"/>
-	<application aid="A0 00 00 05 27 21 01 01" type="yk" name="Yubikey NEO OATH Applet" description="Javacard Applet AID" enabled="true"/>
+	<application aid="A0 00 00 05 27 21 01 01" type="YKNEO" name="Yubikey NEO OATH Applet" description="Javacard Applet AID" enabled="true"/>
 	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 01 00" type="" name="ISD-R Application. Used as TAR." description="" enabled="true"/>
 	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 02 00" type="" name="ECASD Application. Used as TAR." description="" enabled="true"/>
 	<application aid="A0 00 00 05 59 10 10 FF FF FF FF 89 00 00 0D 00" type="" name="ISD-P Executable Load File." description="" enabled="true"/>

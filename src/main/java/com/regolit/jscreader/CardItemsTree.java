@@ -88,7 +88,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                     // discover MF
                     discoveredApps.addAll(processMF(channel, root));
 
-                    // try yubikey app
+                    // try yubikey apps
                     discoveredApps.addAll(processYubikey(channel, root));
 
                     // try OpenPGP application
@@ -137,83 +137,6 @@ class CardItemsTree extends TreeView<CardItemRootModel>
 
     }
 
-    protected void XXXreadSelectedTerminalCard() {
-        var progressWindow = Main.createProgressWindow("Reading card");
-        progressWindow.show();
-
-        var dm = DeviceManager.getInstance();
-        var terminalName = dm.getSelectedTerminalName();
-        var terminal = dm.getTerminal(terminalName);
-
-        if (terminal == null) {
-            return;
-        }
-
-        // set new tree nodes
-        var root = new TreeItem<CardItemRootModel>();
-        root.setExpanded(true);
-        setRoot(root);
-
-        // "General information" node
-        try {
-            var card = terminal.connect("*");
-            var cardGeneralInfo = new CardItemGeneralInformationModel("General Information",
-                card.getATR().getBytes());
-            var generalInformationNode = new TreeItem<CardItemRootModel>(cardGeneralInfo);
-            root.getChildren().add(generalInformationNode);
-
-            // other nodes
-            var channel = card.getBasicChannel();
-            byte[] cmd; 
-            ResponseAPDU answer;
-
-            var discoveredApps = new ArrayList<String>(5);
-
-
-            // discover MF
-            discoveredApps.addAll(processMF(channel, root));
-
-            // try yubikey app
-            discoveredApps.addAll(processYubikey(channel, root));
-
-            // try OpenPGP application
-            discoveredApps.addAll(processOpenpgp(channel, root));
-
-            // try EMV PSE
-            discoveredApps.addAll(processPSE1(channel, root));
-
-            // walk through list of known applications
-            var selectAppCommandTemplate = Util.toByteArray("00 A4 04 00");
-            for (var x : CandidateApplications.getInstance().list()) {
-                if (!x.getEnabled()) {
-                    continue;
-                }
-                var aid = x.getAid();
-                if (discoveredApps.indexOf(Util.hexify(aid)) != -1) {
-                    continue;
-                }
-                byte[] cmdLcPart = {(byte)aid.length};
-                cmd = Util.concatArrays(cmdLcPart, aid);
-                cmd = Util.concatArrays(selectAppCommandTemplate, cmd);
-                answer = channel.transmit(new CommandAPDU(cmd));
-                if (answer.getSW() == 0x9000) {
-                    // insert found ADF info
-                    var adfInfo = new CardItemAdfFCIModel(String.format("ADF (AID=%s)", Util.hexify(aid)), 
-                        answer.getData(), aid, x.getType(), x.getName());
-                    var adfNode = new TreeItem<CardItemRootModel>(adfInfo);
-                    root.getChildren().add(adfNode);
-                }
-            }
-
-            // Select "General Information" node
-            getSelectionModel().selectFirst();
-        } catch (CardException e) {
-            System.err.printf("Card read failed: %s%n", e);
-            e.printStackTrace();
-        }
-        progressWindow.close();
-    }
-
     private List<String> processMF(CardChannel channel, TreeItem<CardItemRootModel> parent)
         throws CardException
     {
@@ -225,7 +148,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             // insert node with master DF information
             var info = new CardItemFCIModel("MF", answer.getData());
             var node = new TreeItem<CardItemRootModel>(info);
-            parent.getChildren().add(node);
+            Platform.runLater(() -> { parent.getChildren().add(node); });
 
             // TODO: add EF.DIR, EF.ATR and other files
         } else {
@@ -238,11 +161,15 @@ class CardItemsTree extends TreeView<CardItemRootModel>
         throws CardException
     {
         var discoveredApps = new ArrayList<String>();
-        var cmd = Util.toByteArray("00 A4 04 00 07 A0 00 00 05 27 21 01");
+
+        // yubikey NEO OATH
+        var cmd = Util.toByteArray("00 A4 04 00 08 A0 00 00 05 27 21 01 01");
         var answer = channel.transmit(new CommandAPDU(cmd));
         if (answer.getSW() == 0x9000) {
-            // System.out.printf("DATA: %s\n", Util.hexify(answer.getData()));
-            discoveredApps.add("A0 00 00 05 27 21 01");
+            var info = new CardItemYkOathFCIModel("Yubikey OATH (AID=A0 00 00 05 27 21 01 01)", answer.getData());
+            var node = new TreeItem<CardItemRootModel>(info);
+            Platform.runLater(() -> { parent.getChildren().add(node); });
+            discoveredApps.add("A0 00 00 05 27 21 01 01");
         }
         return discoveredApps;
     }
@@ -268,7 +195,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             var info = new CardItemPGPModel("OpenPGP (AID=D2 76 00 01 24 01)", dataObjects);
             var node = new TreeItem<CardItemRootModel>(info);
             // node.setExpanded(true);
-            parent.getChildren().add(node);
+            Platform.runLater(() -> { parent.getChildren().add(node); });
             discoveredApps.add("D2 76 00 01 24 01");
         }
         return discoveredApps;
@@ -285,7 +212,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             var pseInfo = new CardItemPSE1FCIModel("EMV: 1PAY.SYS.DDF01", pseFciData);
             var pseNode = new TreeItem<CardItemRootModel>(pseInfo);
             pseNode.setExpanded(true);
-            parent.getChildren().add(pseNode);
+            Platform.runLater(() -> { parent.getChildren().add(pseNode); });
 
             try {
                 BerTlv tlvRoot = BerTlv.parseBytes(pseFciData);
@@ -302,7 +229,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                         List<byte[]> sfiRecords = APDU.sfiRecords(channel, sfi);
                         var sfiInfo = new CardItemSFIModel(String.format("SFI=%d", sfi), sfiRecords);
                         var sfiNode = new TreeItem<CardItemRootModel>(sfiInfo);
-                        pseNode.getChildren().add(sfiNode);
+                        Platform.runLater(() -> { pseNode.getChildren().add(sfiNode); });
 
                         // now analyze sfiRecords and find installed payment applications
                         for (var record : sfiRecords) {
@@ -411,7 +338,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                     var info = new CardItemEmvFCIModel(String.format("EMV: AID=%s", aidString), appFciData, aipData, aflData);
                     var node = new TreeItem<CardItemRootModel>(info);
                     node.setExpanded(true);
-                    parent.getChildren().add(node);
+                    Platform.runLater(() -> { parent.getChildren().add(node); });
 
                     // find EFs
                     int aflPartsCount = aflData.length / 4;
@@ -426,7 +353,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                         List<byte[]> sfiRecords = APDU.sfiRecords(channel, sfi, firstSfiRec, lastSfiRec);
                         var sfiInfo = new CardItemEmvSFIModel(String.format("SFI=%d", sfi), sfiRecords);
                         var sfiNode = new TreeItem<CardItemRootModel>(sfiInfo);
-                        node.getChildren().add(sfiNode);
+                        Platform.runLater(() -> { node.getChildren().add(sfiNode); });
                     }
                     discoveredApps.add(aidString);
                 }

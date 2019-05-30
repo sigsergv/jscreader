@@ -39,7 +39,6 @@ class CardInfoTextView extends VBox {
                     return;
                 }
 
-                // a lot of bs code...
                 var nodeValue = ((TreeItem)newValue).getValue();
                 if (nodeValue instanceof CardItemGeneralInformationModel) {
                     processValue((CardItemGeneralInformationModel)nodeValue);
@@ -49,12 +48,14 @@ class CardInfoTextView extends VBox {
                     processValue((CardItemSFIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemAdfFCIModel) {
                     processValue((CardItemAdfFCIModel)nodeValue);
-                } else if (nodeValue instanceof CardItemFCIModel) {
-                    processValue((CardItemFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemPGPModel) {
                     processValue((CardItemPGPModel)nodeValue);
+                } else if (nodeValue instanceof CardItemYkOathFCIModel) {
+                    processValue((CardItemYkOathFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemPSE1FCIModel) {
                     processValue((CardItemPSE1FCIModel)nodeValue);
+                } else if (nodeValue instanceof CardItemFCIModel) {
+                    processValue((CardItemFCIModel)nodeValue);
                 }
                 // System.out.println(nodeValue.getClass().getName());
                 // processValue(nodeValue);
@@ -144,53 +145,52 @@ class CardInfoTextView extends VBox {
     }
 
     private void processValue(CardItemAdfFCIModel value) {
-        if (value.type == ApplicationInfoModel.TYPE.YK) {
-            processValue((CardItemRootModel)value);
-            // special processing of Yubikey
-            // see https://developers.yubico.com/OATH/YKOATH_Protocol.html
-            var sb = new StringBuilder(getText());
-            var fciData = value.getFciData();
-            sb.append("<p>").append("Yubikey application").append("</p>");
-            sb.append("<p>").append("Challenge data:").append("</p>");
-            sb.append("<pre>");
-            if (fciData[0] == 0x79) {
-                try {
-                    for (SimpleTlv part: SimpleTlv.parseBytes(fciData)) {
-                        switch (part.getTag()) {
-                        case 0x79:
-                            sb.append(String.format("  Version: %s\n", Util.hexify(part.getValue())));
-                            break;
-                        case 0x71:
-                            sb.append(String.format("  Name: %s\n", Util.hexify(part.getValue())));
-                            break;
-                        case 0x74:
-                            sb.append(String.format("  Challenge: %s\n", Util.hexify(part.getValue())));
-                            break;
-                        case 0x7B:
-                            sb.append(String.format("  Algorithm: %s\n", Util.hexify(part.getValue())));
-                            break;
-                        default:
-                            sb.append(String.format("  Unknown block (0x%02X): %s\n", 
-                                part.getTag(), Util.hexify(part.getValue())));
-                        }
+        processValue((CardItemFCIModel)value);
+
+        var sb = new StringBuilder(getText());
+        sb.append(String.format("Application name: %s%n", value.name));
+        setText(sb.toString());
+    }
+
+    private void processValue(CardItemYkOathFCIModel value) {
+        processValue((CardItemRootModel)value);
+        // see https://developers.yubico.com/OATH/YKOATH_Protocol.html
+        var sb = new StringBuilder(getText());
+        var fciData = value.getFciData();
+        sb.append("<p>").append("Yubikey NEO OATH application").append("</p>");
+        sb.append("<p>").append("Challenge data:").append("</p>");
+        sb.append("<pre>");
+        if (fciData[0] == 0x79) {
+            try {
+                for (SimpleTlv part: SimpleTlv.parseBytes(fciData)) {
+                    switch (part.getTag()) {
+                    case 0x79:
+                        sb.append(String.format("  Version: %s\n", Util.hexify(part.getValue())));
+                        break;
+                    case 0x71:
+                        sb.append(String.format("  Name: %s\n", Util.hexify(part.getValue())));
+                        break;
+                    case 0x74:
+                        sb.append(String.format("  Challenge: %s\n", Util.hexify(part.getValue())));
+                        break;
+                    case 0x7B:
+                        sb.append(String.format("  Algorithm: %s\n", Util.hexify(part.getValue())));
+                        break;
+                    default:
+                        sb.append(String.format("  Unknown block (0x%02X): %s\n", 
+                            part.getTag(), Util.hexify(part.getValue())));
                     }
-                } catch (SimpleTlv.ParsingException e) {
-                    sb.append("SIMPLE-TLV parse failed.\n");
-                    sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
                 }
-            } else {
-                sb.append("Failed to parse YKOATH SELECT instruction result.\n");
+            } catch (SimpleTlv.ParsingException e) {
+                sb.append("SIMPLE-TLV parse failed.\n");
                 sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
             }
-            sb.append("</pre>");
-            setText(sb.toString());
         } else {
-            processValue((CardItemFCIModel)value);
-
-            var sb = new StringBuilder(getText());
-            sb.append(String.format("Application name: %s%n", value.name));
-            setText(sb.toString());
+            sb.append("Failed to parse YKOATH SELECT instruction result.\n");
+            sb.append(String.format("Raw data: %s\n", Util.hexify(fciData)));
         }
+        sb.append("</pre>");
+        setText(sb.toString());
     }
 
     private void processValue(CardItemPGPModel value) {
