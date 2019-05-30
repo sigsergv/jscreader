@@ -18,6 +18,14 @@ Create binary distribution (still requires external JRE/JDK):
 
     ./gradlew distZip
 
+Create binary image:
+
+    ./gradlew jlink
+
+To reduce size of created image (linux):
+    
+    find build/image -name '*.so' -exec strip -p --strip-unneeded {} \;
+
 
 APIs and manuals
 ================
