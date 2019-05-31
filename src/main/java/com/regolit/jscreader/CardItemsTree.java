@@ -108,8 +108,11 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                             continue;
                         }
                         byte[] cmdLcPart = {(byte)aid.length};
+                        byte[] cmdLePart = {0};
                         cmd = Util.concatArrays(cmdLcPart, aid);
                         cmd = Util.concatArrays(selectAppCommandTemplate, cmd);
+                        cmd = Util.concatArrays(cmd, cmdLePart);
+                        
                         answer = channel.transmit(new CommandAPDU(cmd));
                         if (answer.getSW() == 0x9000) {
                             if (x.getType() == ApplicationInfoModel.TYPE.GP) {
@@ -151,7 +154,6 @@ class CardItemsTree extends TreeView<CardItemRootModel>
         var discoveredApps = new ArrayList<String>();
         var cmd = Util.toByteArray("00 A4 00 00 02 3F 00 00");
         var answer = channel.transmit(new CommandAPDU(cmd));
-
         if (answer.getSW() == 0x9000) {
             // insert node with master DF information
             var info = new CardItemFCIModel("MF", answer.getData());
@@ -161,6 +163,12 @@ class CardItemsTree extends TreeView<CardItemRootModel>
             // TODO: add EF.DIR, EF.ATR and other files
         } else {
             // System.out.printf("No MF, SW: %04X\n", answer.getSW());
+        }
+
+        cmd = Util.toByteArray("00 A4 00 04 00");
+        answer = channel.transmit(new CommandAPDU(cmd));
+        if (answer.getSW() == 0x9000) {
+            System.out.printf("found 0\n");
         }
         return discoveredApps;
     }

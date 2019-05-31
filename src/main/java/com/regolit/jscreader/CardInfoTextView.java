@@ -130,7 +130,7 @@ class CardInfoTextView extends VBox {
         processValue((CardItemRootModel)value);
 
         var sb = new StringBuilder(getText());
-        sb.append("<h4>").append("GlobalPlatform app").append("</h4>");
+        sb.append("<h4>").append("GlobalPlatform app: ").append(value.getName()).append("</h4>");
         var fciData = value.getFciData();
 
         try {
