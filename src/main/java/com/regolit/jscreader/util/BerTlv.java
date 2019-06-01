@@ -25,12 +25,6 @@ public class BerTlv {
         }
     }
 
-    public static class ConstraintException extends Exception {
-        public ConstraintException(String message) {
-            super(message);
-        }
-    }
-
     private final byte[] tag;
     private final Encoding encoding;
     private final TagClass tagClass;
@@ -43,33 +37,23 @@ public class BerTlv {
 
 
     // constructed value constructor
-    public BerTlv(byte[] tag, List<BerTlv> parts)
-        throws ConstraintException
-    {
+    public BerTlv(byte[] tag, List<BerTlv> parts) {
         this.tag = tag;
         this.parts = parts;
         this.value = null;
 
         this.encoding = Encoding.CONSTRUCTED;
         this.tagClass = getClassFromTag(tag);
-        if (getEncodingFromTag(tag) != this.encoding) {
-            throw new ConstraintException("Incorrect tag encoding");
-        }
     }
 
     // primitive value constructor
-    public BerTlv(byte[] tag, byte[] value)
-        throws ConstraintException
-    {
+    public BerTlv(byte[] tag, byte[] value) {
         this.tag = tag;
         this.parts = null;
         this.value = value;
 
         this.encoding = Encoding.PRIMITIVE;
         this.tagClass = getClassFromTag(tag);
-        if (getEncodingFromTag(tag) != this.encoding) {
-            throw new ConstraintException("Incorrect tag encoding");
-        }
     }
 
     public byte[] getTag() {
@@ -120,7 +104,6 @@ public class BerTlv {
      * Get first part tagged with tag that has binary representation tagBytesRepr
      * @param  tagBytesRepr        [description]
      * @return                     [description]
-     * @throws ConstraintException [description]
      */
     public BerTlv getPart(String tagBytesRepr) {
         return getPart(Util.toByteArray(tagBytesRepr));
@@ -130,7 +113,6 @@ public class BerTlv {
      * Get first part tagged with tag tag.
      * @param  tag                 [description]
      * @return                     [description]
-     * @throws ConstraintException [description]
      */
     public BerTlv getPart(byte[] tag) {
         if (this.encoding != Encoding.CONSTRUCTED) {
@@ -152,12 +134,7 @@ public class BerTlv {
      * Get all parts
      * @return [description]
      */
-    public BerTlv[] getParts()
-        throws ConstraintException
-    {
-        if (this.encoding != Encoding.CONSTRUCTED) {
-            throw new ConstraintException("Only CONSTRUCTED objects have parts.");
-        }
+    public BerTlv[] getParts() {
         BerTlv[] res = new BerTlv[parts.size()];
         return parts.toArray(res);
     }
@@ -240,8 +217,6 @@ public class BerTlv {
             Pair pair = new Pair(p+length, t);
             return pair;
 
-        } catch (ConstraintException e) {
-            throw new ParsingException("Inconsistent data");
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new ParsingException("Premature end of bytes");
         }

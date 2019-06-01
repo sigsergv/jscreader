@@ -48,7 +48,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
     }
 
     protected void readSelectedTerminalCard() {
-        progressWindow = Main.createProgressWindow("Reading card");
+        progressWindow = Main.createProgressWindow("Probing for known apps");
         progressWindow.show();
 
         var workerThread = new Thread() {
@@ -121,6 +121,8 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                                     answer.getData(), aid, x.getName());
                                 var node = new TreeItem<CardItemRootModel>(info);
                                 Platform.runLater(() -> { root.getChildren().add(node); });
+                            } else if (x.getType() == ApplicationInfoModel.TYPE.EMV) {
+                                processEmvAid(channel, root, aid);
                             } else {
                                 // insert found ADF info
                                 var info = new CardItemAdfFCIModel(String.format("ADF (AID=%s)", Util.hexify(aid)), 
@@ -131,6 +133,7 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                         }
                     }
 
+                    card.disconnect(true);
                     // Select "General Information" node
                     Platform.runLater(() -> { getSelectionModel().selectFirst(); });
                 } catch (CardException e) {
@@ -268,8 +271,6 @@ class CardItemsTree extends TreeView<CardItemRootModel>
                 }
             } catch (BerTlv.ParsingException e) {
                 Util.errorLog("Failed to parse data while processing PSE1");
-            } catch (BerTlv.ConstraintException e) {
-                Util.errorLog("Failed to parse (constraint) data while processing PSE1");
             }
             discoveredApps.add("31 50 41 59 2E 53 59 53 2E 44 44 46 30 31");
         }

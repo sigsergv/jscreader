@@ -150,6 +150,7 @@ public class Util {
             String name = null;
             byte[] value = b.getValue();
             String displayValue = Util.hexify(value);
+            // ByteArrayInputStream bis;
 
             switch (tag) {
             case 0x56:
@@ -189,9 +190,114 @@ public class Util {
             case 0x8D:
                 name = "Card Risk Management Data Object List 2 (CDOL2)";
                 break;
-            case 0x8E:
+            case 0x8E: {
+                // see EMV v4.3, section "C3 Cardholder Verification Rule Format"
+                // Ex: "00 00 00 00  00 00 00 00  44 03 41 03 42 03 1E 03 1F 02"
+                //     "00 00 00 00  00 00 00 00  42 03 44 03 41 03 1E 03 1F 02"
+                //     "00 00 00 00  00 00 00 00  42 01 5E 03 42 03 1F 03"
                 name = "Cardholder Verification Method (CVM) List";
+                var amountX = copyArray(value, 0, 4);
+                var amountY = copyArray(value, 4, 8);
+                // parse CVRules
+                int pos = 8;
+                var rulesSb = new StringBuilder();
+                rulesSb.append("<blockquote>Cardholder Verification Method Rules:<ul>");
+                while (true) {
+                    if (pos >= value.length) {
+                        break;
+                    }
+                    int b1 = value[pos];
+                    int b2 = value[pos+1];
+                    rulesSb.append("<li>");
+
+                    // CVM Codes
+                    if ((b1 & 0x20) == 0) {
+                        // i.e. 6th bit is 0
+                        // EMV rules
+                        switch (b1 & 0x1F) { // take least 6 bits
+                        case 0x0:
+                                rulesSb.append("Fail CVM processing");
+                            break;
+                        case 0x1:
+                            rulesSb.append("Plaintext PIN verification performed by ICC");
+                            break;
+                        case 0x2:
+                            rulesSb.append("Enciphered PIN verified online");
+                            break;
+                        case 0x3:
+                            rulesSb.append("Plaintext PIN verification performed by ICC and signature (paper)");
+                            break;
+                        case 0x4:
+                            rulesSb.append("Enciphered PIN verification performed by ICC");
+                            break;
+                        case 0x1E:
+                            rulesSb.append("Signature (paper)");
+                            break;
+                        case 0x1F:
+                            rulesSb.append("No CVM required");
+                            break;
+                        default:
+                            rulesSb.append("Unknown EMV CVM Rule ").append(b1 & 0x1F);
+                        }
+                    } else {
+                        // i.e. 6th bit is 1
+                        if ((b1 & 0x10) == 0) {
+                            // i.e. 5th bit is 0
+                            rulesSb.append("individual payment system CVM rule ").append(b1 & 0x1F);
+                        } else {
+                            rulesSb.append("issuer CVM rule ").append(b1 & 0x1F);
+                        }
+                    }
+
+                    // CVM Condition Codes
+                    switch (b2) {
+                    case 0x0:
+                        rulesSb.append(", always");
+                        break;
+                    case 0x1:
+                        rulesSb.append(", If unattended cash");
+                        break;
+                    case 0x2:
+                        rulesSb.append(", If not unattended cash and not manual cash and not purchase with cashback");
+                        break;
+                    case 0x3:
+                        rulesSb.append(", If terminal supports the CVM");
+                        break;
+                    case 0x4:
+                        rulesSb.append(", If manual cash");
+                        break;
+                    case 0x5:
+                        rulesSb.append(", If purchase with cashback");
+                        break;
+                    case 0x6:
+                        rulesSb.append(", If transaction is in the application currency and is under X value");
+                        break;
+                    case 0x7:
+                        rulesSb.append(", If transaction is in the application currency and is over X value");
+                        break;
+                    case 0x8:
+                        rulesSb.append(", If transaction is in the application currency and is under Y value");
+                    case 0x9:
+                        rulesSb.append(", If transaction is in the application currency and is over Y value");
+                        break;
+                    default:
+                        if (b2 >= 0x80 && b2 <= 0xFF ) {
+                            rulesSb.append(", Payment system condition ").append(b2);
+                        }
+                    }
+
+                    if ((b1 & 0x40) == 0) {
+                        rulesSb.append(", fail");
+                    } else {
+                        rulesSb.append(", next");
+                    }
+                    rulesSb.append("</li>");
+                    pos += 2;
+                }
+                rulesSb.append("</ul></blockquote>");
+                displayValue = rulesSb.toString();
                 break;
+            }
             case 0x8F:
                 name = "Certification Authority Public Key Index";
                 break;

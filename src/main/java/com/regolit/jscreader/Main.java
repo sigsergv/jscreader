@@ -81,6 +81,7 @@ public class Main extends Application {
         progressWindow.initOwner(Main.getPrimaryStage());
         progressWindow.initModality(javafx.stage.Modality.APPLICATION_MODAL);
         var label = new Label(labelText);
+        label.setAlignment(javafx.geometry.Pos.CENTER);
         var scene = new Scene(label, 400, 100);
         progressWindow.setScene(scene);
         progressWindow.show();

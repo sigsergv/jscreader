@@ -46,10 +46,12 @@ class CardInfoTextView extends VBox {
                     processValue((CardItemEmvSFIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemSFIModel) {
                     processValue((CardItemSFIModel)nodeValue);
-                } else if (nodeValue instanceof CardItemAdfFCIModel) {
-                    processValue((CardItemAdfFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemPGPModel) {
                     processValue((CardItemPGPModel)nodeValue);
+                } else if (nodeValue instanceof CardItemEmvFCIModel) {
+                    processValue((CardItemEmvFCIModel)nodeValue);
+                } else if (nodeValue instanceof CardItemAdfFCIModel) {
+                    processValue((CardItemAdfFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemYkOathFCIModel) {
                     processValue((CardItemYkOathFCIModel)nodeValue);
                 } else if (nodeValue instanceof CardItemPSE1FCIModel) {
@@ -81,12 +83,12 @@ class CardInfoTextView extends VBox {
         var records = value.getRecords();
 
         var sb = new StringBuilder(getText());
-        sb.append("Raw EF data\n\n");
-        sb.append(String.format("  Total records: %d\n", records.size()));
+        sb.append("<p>Raw EF data</p>");
+        sb.append(String.format("<p>Total records: %d</p>", records.size()));
 
         var iter = records.listIterator();
         while (iter.hasNext()) {
-            sb.append(String.format("    Record %d: %s\n", iter.nextIndex(), 
+            sb.append(String.format("<p><b>Record %d</b>: %s</p>", iter.nextIndex(), 
                 Util.hexify(iter.next())));
         }
         setText(sb.toString());
@@ -108,8 +110,6 @@ class CardInfoTextView extends VBox {
                 }
             } catch (BerTlv.ParsingException e) {
                 Util.errorLog("processValue(CardItemEmvSFIModel): failed to parse");
-            } catch (BerTlv.ConstraintException e) {
-                Util.errorLog("processValue(CardItemEmvSFIModel): failed to parse (constraint)");
             }
         }
 
@@ -117,7 +117,9 @@ class CardInfoTextView extends VBox {
 
         for (var b : readObjects) {
             String tagString = Util.hexify(b.getTag());
-            sb.append(String.format("    %s\n", mappedValues.get(tagString)));
+            sb.append("<p>")
+                .append(String.format("%s", mappedValues.get(tagString)))
+                .append("</p>");
         }
         setText(sb.toString());
     }
@@ -293,13 +295,144 @@ class CardInfoTextView extends VBox {
                 sb.append(root.toString());
                 sb.append("</pre>");
             }
-        // } catch (BerTlv.ConstraintException e) {
-        //     sb.append(String.format("Failed to parse FCI data: %s\n", e));
         } catch (BerTlv.ParsingException e) {
             // sb.append(String.format("Failed to parse FCI data: %s\n", e));
             sb.append("<p>").append("Failed to decode data as FCI object.").append("</p>");
             sb.append("<p>").append("Raw data:").append("</p>");
+            sb.append("<pre>").append(Util.hexify(fciData, 16)).append("</pre>");
+        }
+        setText(sb.toString());
+    }
 
+    private void processValue(CardItemEmvFCIModel value) {
+        processValue((CardItemRootModel)value);
+
+        var sb = new StringBuilder(getText());
+        var fciData = value.getFciData();
+
+        try {
+            // see EMV v4.3; Book 1; section "11.3.4 Data Field Returned in the Response Message", Table 45
+            sb.append("<p>EMV application.</p>");
+            var root = BerTlv.parseBytes(fciData);
+            if (root.tagEquals("6F")) {
+                var part = root.getPart("84");
+                sb.append("<p>")
+                    .append("<b>DF Name:</b> ")
+                    .append(Util.hexify(part.getValue()))
+                    .append("</p>");
+                var piTlv = root.getPart("A5");
+                if (piTlv != null) {
+                    part = piTlv.getPart("50");
+                    if (part != null) {
+                        sb.append("<p><b>Application label:</b> ")
+                            .append(Util.asciify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("87");
+                    if (part != null) {
+                        sb.append("<p><b>Application Priority Indicator:</b> ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("9F 11");
+                    if (part != null) {
+                        sb.append("<p><b>Issuer Code Table Index:</b> ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("9F 12");
+                    if (part != null) {
+                        sb.append("<p><b>Application Preferred Name:</b> ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("9F 38");
+                    if (part != null) {
+                        sb.append("<p><b>PDOL:</b> ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("88");
+                    if (part != null) {
+                        sb.append("<p><b>SFI of the Directory Elementary File:</b> ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("5F 2D");
+                    if (part != null) {
+                        sb.append("<p><b>Language Preference:</b> ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("9F 11");
+                    if (part != null) {
+                        sb.append("<p><b>Issuer Code Table Index:</b> ")
+                            .append(Util.hexify(part.getValue()))
+                            .append("</p>");
+                    }
+                    part = piTlv.getPart("BF 0C");
+                    if (part != null) {
+                        sb.append("<p><p><b>FCI Issuer Discretionary Data</b></p>")
+                            .append("<blockquote>");
+
+                        for (var iddTlv : part.getParts()) {
+                            if (iddTlv.tagEquals("9F 4D")) {
+                                sb.append("<p><b>Log Entry:</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                            } else if (iddTlv.tagEquals("5F 50")) {
+                                sb.append("<p><b>Issuer URL:</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                            } else if (iddTlv.tagEquals("5F 53")) {
+                                sb.append("<p><b>International Bank Account Number (IBAN):</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                            } else if (iddTlv.tagEquals("5F 54")) {
+                                sb.append("<p><b>Bank Identifier Code (BIC):</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                            } else if (iddTlv.tagEquals("5F 55")) {
+                                sb.append("<p><b>Issuer Country Code (alpha2 format):</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                            } else if (iddTlv.tagEquals("5F 56")) {
+                                sb.append("<p><b>Issuer Country Code (alpha3 format):</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                            } else if (iddTlv.tagEquals("42")) {
+                                sb.append("<p><b>Issuer Identification Number (IIN):</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                            } else {
+                                sb.append("<p><b>TAG:").append(Util.hexify(iddTlv.getTag())).append(":</b> ")
+                                    .append(Util.hexify(iddTlv.getValue()))
+                                    .append("</p>");
+                                }
+                        }
+
+                        // sb.append("<pre>");
+                        // sb.append(part.toString());
+                        // sb.append("</pre>");
+
+                        sb.append("</blockquote>")
+                            .append("</p>");
+                    }
+                }
+                sb.append("<p>RAW data:</p>");
+                sb.append("<pre>");
+                sb.append(root.toString());
+                sb.append("</pre>");
+            } else {
+                sb.append("<p>").append("Unknown BER-TLV data (FCI template expected):\n").append("</p>");
+                sb.append("<pre>");
+                sb.append(root.toString());
+                sb.append("</pre>");
+            }
+
+        } catch (BerTlv.ParsingException e) {
+            sb.append("<p>").append("Failed to decode data as FCI object.").append("</p>");
+            sb.append("<p>").append("Raw data:").append("</p>");
             sb.append("<pre>").append(Util.hexify(fciData, 16)).append("</pre>");
         }
         setText(sb.toString());
